@@ -4,6 +4,7 @@ import { signup } from "../../api/auth.api";
 import { useCollegeSearch } from "../../hooks/useCollegeSearch";
 import { Eye, EyeOff, Search, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
+import { queryClient } from "../../lib/queryClient.js";
 
 export default function SignupForm() {
   const [query, setQuery] = useState("");
@@ -18,6 +19,7 @@ export default function SignupForm() {
     mutationFn: signup,
     onSuccess: () => {
       toast.success("Account created successfully! Please check your email to verify.");
+      queryClient.invalidateQueries(["me"]);
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to create account. Please try again.");

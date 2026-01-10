@@ -4,6 +4,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { login, googleLogin } from "../../api/auth.api";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { toast } from "react-toastify";
+import { queryClient } from "../../lib/queryClient.js";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ export default function LoginForm() {
     mutationFn: login,
     onSuccess: () => {
       toast.success("Login successful! Redirecting...");
+      queryClient.invalidateQueries(["me"]);
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Invalid email or password.");
@@ -26,6 +28,7 @@ export default function LoginForm() {
     onSuccess: () => {
       setIsGooglePending(false);
       toast.success("Google login successful! Redirecting...");
+      queryClient.invalidateQueries(["me"]);
     },
     onError: (error) => {
       setIsGooglePending(false);
@@ -76,7 +79,7 @@ export default function LoginForm() {
 
       {/* Email Input */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">Student Email</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
