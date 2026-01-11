@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useFeed } from "../../hooks/useFeed";
 import FeedItem from "../../components/feed/FeedItem";
+import FeedSkeleton from "../../components/feed/FeedSkeleton";
+import FeedError from "../../components/feed/FeedError";
 
 export default function FeedPage({ scope = "college", clubId = null, collegeId }) {
     const {
@@ -9,6 +11,7 @@ export default function FeedPage({ scope = "college", clubId = null, collegeId }
         hasNextPage,
         isFetchingNextPage,
         status,
+        refetch,
     } = useFeed({ scope, clubId, collegeId });
 
     const observerRef = useRef(null);
@@ -30,11 +33,21 @@ export default function FeedPage({ scope = "college", clubId = null, collegeId }
 
     /* -------- HARD GUARDS -------- */
     if (status === "pending") {
-        return <div className="p-6">Loading feed…</div>;
+        return (
+            <div className="min-h-screen bg-gray-100 p-6">
+                <div className="mx-auto w-full max-w-3xl">
+                    <FeedSkeleton />
+                </div>
+            </div>
+        );
     }
 
     if (status === "error") {
-        return <div className="p-6">Failed to load feed</div>;
+        return (
+            <div className="min-h-screen bg-gray-100 p-6">
+                <FeedError onRetry={() => refetch()} />
+            </div>
+        );
     }
 
     // ✅ ONLY now data is guaranteed
