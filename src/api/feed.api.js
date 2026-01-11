@@ -5,11 +5,13 @@ import axios from "../lib/axios";
  * queryKey = ["feed", { scope, collegeId, clubId, limit }]
  */
 export const fetchFeed = async ({ pageParam = null, queryKey }) => {
-  const [_key, { scope, collegeId, clubId, limit }] = queryKey;
+  const [_key, { scope, collegeId, clubId, limit, types, eventStatus }] = queryKey;
 
   const params = { limit };
   if (clubId) params.clubId = clubId;
   if (pageParam) params.cursor = pageParam;
+  if (types) params.types = types;
+  if (eventStatus) params.eventStatus = eventStatus;
 
   let url;
 

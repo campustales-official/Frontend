@@ -12,7 +12,7 @@ export default function FeedPage({ scope = "college", clubId = null, collegeId }
         isFetchingNextPage,
         status,
         refetch,
-    } = useFeed({ scope, clubId, collegeId });
+    } = useFeed({ scope, clubId, collegeId, types: "post,event" });
 
     const observerRef = useRef(null);
 
