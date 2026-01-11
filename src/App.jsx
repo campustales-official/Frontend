@@ -9,6 +9,7 @@ import { useMe } from "./hooks/useMe";
 
 import AuthPage from "./pages/Auth/AuthPage";
 import VerifyEmailOtpPage from "./pages/Auth/VerifyEmailOtpPage";
+import FeedPage from "./pages/Feed/FeedPage";
 
 function GuardedRoutes() {
   const location = useLocation();
@@ -57,12 +58,15 @@ function GuardedRoutes() {
       <Route path="/login" element={<AuthPage />} />
       <Route path="/signup" element={<AuthPage />} />
       <Route path="/verify-email" element={<VerifyEmailOtpPage />} />
-      <Route path="/" element={<div>APP HOME</div>} />
+      <Route path="/" element={<FeedPage scope="college" collegeId={me.college.id}/>} />
     </Routes>
   );
 }
 
 export default function App() {
+  const { data: me } = useMe();
+  console.log(me);
+
   return (
     <BrowserRouter>
       <GuardedRoutes />
