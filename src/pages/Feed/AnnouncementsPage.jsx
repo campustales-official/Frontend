@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useFeed } from "../../hooks/useFeed";
-import FeedItem from "../../components/feed/FeedItem";
+import AnnouncementItem from "../../components/feed/AnnouncementItem";
 import FeedSkeleton from "../../components/feed/FeedSkeleton";
 import DataError from "../../components/common/DataError";
 
-export default function FeedPage({ scope = "college", clubId = null, collegeId }) {
+export default function AnnouncementsPage({ scope = "college", clubId = null, collegeId }) {
     const {
         data,
         fetchNextPage,
@@ -12,7 +12,7 @@ export default function FeedPage({ scope = "college", clubId = null, collegeId }
         isFetchingNextPage,
         status,
         refetch,
-    } = useFeed({ scope, clubId, collegeId, types: "post,event", eventStatus: "published" });
+    } = useFeed({ scope, clubId, collegeId, types: "announcement" });
 
     const observerRef = useRef(null);
 
@@ -45,7 +45,7 @@ export default function FeedPage({ scope = "college", clubId = null, collegeId }
     if (status === "error") {
         return (
             <div className="min-h-screen bg-gray-200 p-6">
-                <DataError onRetry={() => refetch()} title="Feed Unavailable" />
+                <DataError onRetry={() => refetch()} />
             </div>
         );
     }
@@ -56,9 +56,15 @@ export default function FeedPage({ scope = "college", clubId = null, collegeId }
     return (
         <div className="min-h-screen bg-gray-200">
             <div className="mx-auto w-full max-w-3xl px-4 py-6 flex flex-col gap-6">
-                {items.map((item) => (
-                    <FeedItem key={`${item.type}-${item.id}`} item={item} />
-                ))}
+                {items.length === 0 ? (
+                    <div className="text-center py-10 text-gray-500">
+                        No announcements found.
+                    </div>
+                ) : (
+                    items.map((item) => (
+                        <AnnouncementItem key={item.id} item={item} />
+                    ))
+                )}
 
                 {hasNextPage && (
                     <div ref={observerRef} className="h-8" />

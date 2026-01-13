@@ -1,4 +1,4 @@
-import { GraduationCap } from "lucide-react";
+import { Landmark, Users, Clock } from "lucide-react";
 
 export default function AnnouncementItem({ item }) {
   const { data, college, club, createdAt } = item;
@@ -13,35 +13,35 @@ export default function AnnouncementItem({ item }) {
     return `${Math.floor(diff / 1440)}d ago`;
   };
 
-  return (
-    <article className="overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 border-l-4 border-l-orange-500 p-5">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">
-            Announcement
-          </span>
-          <span className="text-gray-400 text-xs">•</span>
-          <span className="text-gray-500 text-sm">{timeAgo(createdAt || new Date().toISOString())}</span>
-        </div>
+  const isClub = !!club;
+  const entityName = isClub ? club.name : college?.name;
+  const entitySubtext = isClub ? `${college?.name}` : "Administration Dept.";
 
-        <div className="flex items-center gap-1.5 text-gray-500 text-sm">
-          <GraduationCap className="w-4 h-4" />
-          <span className="font-medium text-gray-700">{college?.name}</span>
-          {club && (
-            <>
-              <span>•</span>
-              <span>{club.name}</span>
-            </>
-          )}
+  return (
+    <article className="rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 border-l-4 border-l-orange-500 p-5">
+      {/* Entity Info */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${isClub ? "bg-purple-50 border-purple-100 text-purple-600" : "bg-slate-50 border-slate-100 text-slate-600"
+          }`}>
+          {isClub ? <Users className="w-5 h-5" /> : <Landmark className="w-5 h-5" />}
+        </div>
+        <div className="flex-1">
+          <h4 className="text-sm font-bold text-gray-900 leading-tight">{entityName}</h4>
+          <div className="flex items-center justify-between mt-0.5">
+            <p className="text-xs text-gray-500 font-medium">{entitySubtext}</p>
+            <div className="flex items-center gap-1.5 text-gray-400 text-xs font-medium">
+              <Clock className="w-3.5 h-3.5" />
+              {timeAgo(createdAt || new Date().toISOString())}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <h3 className="text-lg font-bold text-gray-900 mb-2">{data.title}</h3>
-      <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">{data.content || data.description || data.message}</p>
-
-      {/* No "View Full Notice" as requested */}
+      <div className="space-y-2">
+        <h3 className="text-lg font-bold text-gray-900 leading-tight">{data.title}</h3>
+        <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">{data.content || data.description || data.message}</p>
+      </div>
     </article>
   );
 }

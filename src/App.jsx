@@ -10,6 +10,9 @@ import { useMe } from "./hooks/useMe";
 import AuthPage from "./pages/Auth/AuthPage";
 import VerifyEmailOtpPage from "./pages/Auth/VerifyEmailOtpPage";
 import FeedPage from "./pages/Feed/FeedPage";
+import AnnouncementsPage from "./pages/Feed/AnnouncementsPage";
+import ClubsPage from "./pages/Clubs/ClubsPage";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 function GuardedRoutes() {
   const location = useLocation();
@@ -58,7 +61,14 @@ function GuardedRoutes() {
       <Route path="/login" element={<AuthPage />} />
       <Route path="/signup" element={<AuthPage />} />
       <Route path="/verify-email" element={<VerifyEmailOtpPage />} />
-      <Route path="/" element={<FeedPage scope="college" collegeId={me.college.id}/>} />
+
+      {/* Dashboard Routes */}
+      <Route path="/" element={<DashboardLayout />}>
+        <Route index element={<FeedPage scope="college" collegeId={me.college.id} />} />
+        <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college.id} />} />
+        <Route path="clubs" element={<ClubsPage collegeId={me.college.id} />} />
+        {/* Add more nested routes here later for events, profile */}
+      </Route>
     </Routes>
   );
 }

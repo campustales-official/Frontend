@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Share2, Bookmark } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function EventItem({ item }) {
     const { data, college, club, id } = item;
@@ -49,15 +50,38 @@ export default function EventItem({ item }) {
 
                 {/* Actions */}
                 <div className="mt-auto flex justify-center">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/register");
-                        }}
-                        className="w-full max-w-[200px] bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition active:scale-[0.98] text-sm"
-                    >
-                        Register Now
-                    </button>
+                    {(() => {
+                        const now = new Date();
+                        const startAt = new Date(data.registrationStartAt);
+                        const endAt = new Date(data.registrationEndAt);
+                        const isNotStarted = startAt > now;
+                        const isEnded = endAt < now;
+
+                        return (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (isNotStarted) {
+                                        toast.info("Registration has not started yet");
+                                        return;
+                                    }
+                                    if (isEnded) {
+                                        toast.error("Registration has ended");
+                                        return;
+                                    }
+                                    navigate("/register");
+                                }}
+                                className={`w-full max-w-[200px] font-semibold py-2 rounded-lg transition active:scale-[0.98] text-sm ${isNotStarted
+                                        ? "bg-gray-100 text-gray-400 cursor-default"
+                                        : "bg-blue-600 text-white hover:bg-blue-700"
+                                    }`}
+                            >
+                                {isNotStarted
+                                    ? `Starts ${startAt.toLocaleTimeString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                                    : "Register Now"}
+                            </button>
+                        );
+                    })()}
                 </div>
             </div>
         </article>
