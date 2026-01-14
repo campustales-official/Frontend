@@ -9,6 +9,7 @@ import { useMe } from "./hooks/useMe";
 
 import AuthPage from "./pages/Auth/AuthPage";
 import VerifyEmailOtpPage from "./pages/Auth/VerifyEmailOtpPage";
+import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
 import FeedPage from "./pages/Feed/FeedPage";
 import AnnouncementsPage from "./pages/Feed/AnnouncementsPage";
 import ClubsPage from "./pages/Clubs/ClubsPage";
@@ -28,12 +29,14 @@ function GuardedRoutes() {
 
   // 🔐 Not logged in
   if (!isLoggedIn) {
-    // Allow access to login/signup only
-    if (path === "/login" || path === "/signup") {
+    // Allow access to login/signup/forgot-password only
+    const publicPaths = ["/login", "/signup", "/forgot-password"];
+    if (publicPaths.includes(path)) {
       return (
         <Routes>
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Routes>
       );
     }
@@ -41,8 +44,9 @@ function GuardedRoutes() {
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ Logged in - redirect away from auth pages
-  if (path === "/login" || path === "/signup") {
+  // ✅ Logged in - redirect away from public auth pages
+  const publicAuthPaths = ["/login", "/signup", "/forgot-password"];
+  if (publicAuthPaths.includes(path)) {
     return <Navigate to="/" replace />;
   }
 
@@ -61,8 +65,13 @@ function GuardedRoutes() {
 
   return (
     <Routes>
+      {/* 
+          Note: These routes are technically already handled by the logic above,
+          but we include them here for completeness and to handle nested routing structures if needed.
+      */}
       <Route path="/login" element={<AuthPage />} />
       <Route path="/signup" element={<AuthPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailOtpPage />} />
 
       {/* Dashboard Routes */}
@@ -80,9 +89,6 @@ function GuardedRoutes() {
 }
 
 export default function App() {
-  const { data: me } = useMe();
-  console.log(me);
-
   return (
     <BrowserRouter>
       <GuardedRoutes />

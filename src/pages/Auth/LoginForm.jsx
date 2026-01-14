@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { GoogleLogin } from "@react-oauth/google";
 import { login, googleLogin } from "../../api/auth.api";
@@ -120,9 +121,9 @@ export default function LoginForm() {
           <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
           <span className="text-gray-600">Remember me</span>
         </label>
-        <a href="#" className="text-blue-600 font-medium hover:underline">
+        <Link to="/forgot-password" title="Forgot password?" className="text-blue-600 font-medium hover:underline">
           Forgot password?
-        </a>
+        </Link>
       </div>
 
       {/* Submit */}
