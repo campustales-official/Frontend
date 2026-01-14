@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { likePost } from "../../api/posts.api";
 import { Heart, User, ChevronLeft, ChevronRight } from "lucide-react";
+import ActionMenu from "../common/ActionMenu";
 
 const PostImageCarousel = ({ images }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -88,7 +89,7 @@ const PostImageCarousel = ({ images }) => {
     );
 };
 
-export default function PostItem({ item }) {
+export default function PostItem({ item, actions }) {
     const { data, college, club, id, createdAt } = item;
     const queryClient = useQueryClient();
 
@@ -169,9 +170,14 @@ export default function PostItem({ item }) {
                     </div>
                 </div>
 
-                <span className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">
-                    Post
-                </span>
+                <div className="flex items-center gap-3">
+                    <span className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">
+                        Post
+                    </span>
+                    {actions && (
+                        <ActionMenu onEdit={actions.onEdit} onDelete={actions.onDelete} />
+                    )}
+                </div>
             </div>
 
             {/* Content */}

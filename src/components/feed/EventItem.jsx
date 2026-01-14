@@ -1,13 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Share2, Bookmark } from "lucide-react";
 import { toast } from "react-toastify";
+import ActionMenu from "../common/ActionMenu";
 
-export default function EventItem({ item }) {
+export default function EventItem({ item, actions }) {
     const { data, college, club, id } = item;
     const navigate = useNavigate();
 
     return (
-        <article className="overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 flex flex-col sm:flex-row">
+        <article className="overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 flex flex-col sm:flex-row relative group">
+            {/* Admin Actions */}
+            {actions && (
+                <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-white/80 backdrop-blur rounded-full shadow-sm">
+                        <ActionMenu onEdit={actions.onEdit} onDelete={actions.onDelete} />
+                    </div>
+                </div>
+            )}
+
             {/* Left Image Section */}
             <div className="relative w-full sm:w-2/5 h-48 sm:h-auto bg-gray-100">
                 <img
@@ -72,8 +82,8 @@ export default function EventItem({ item }) {
                                     navigate("/register");
                                 }}
                                 className={`w-full max-w-[200px] font-semibold py-2 rounded-lg transition active:scale-[0.98] text-sm ${isNotStarted
-                                        ? "bg-gray-100 text-gray-400 cursor-default"
-                                        : "bg-blue-600 text-white hover:bg-blue-700"
+                                    ? "bg-gray-100 text-gray-400 cursor-default"
+                                    : "bg-blue-600 text-white hover:bg-blue-700"
                                     }`}
                             >
                                 {isNotStarted

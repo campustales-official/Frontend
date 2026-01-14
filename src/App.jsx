@@ -12,6 +12,7 @@ import VerifyEmailOtpPage from "./pages/Auth/VerifyEmailOtpPage";
 import FeedPage from "./pages/Feed/FeedPage";
 import AnnouncementsPage from "./pages/Feed/AnnouncementsPage";
 import ClubsPage from "./pages/Clubs/ClubsPage";
+import ClubDetailsPage from "./pages/Clubs/ClubDetailsPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 function GuardedRoutes() {
@@ -67,7 +68,8 @@ function GuardedRoutes() {
         <Route index element={<FeedPage scope="college" collegeId={me.college.id} />} />
         <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college.id} />} />
         <Route path="clubs" element={<ClubsPage collegeId={me.college.id} />} />
-        {/* Add more nested routes here later for events, profile */}
+        <Route path="club/:clubId" element={<ClubDetailsPage />} />
+        {/* Add more nested routes here later for profile */}
       </Route>
     </Routes>
   );

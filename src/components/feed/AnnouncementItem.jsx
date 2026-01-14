@@ -1,6 +1,7 @@
-import { Landmark, Users, Clock } from "lucide-react";
+import { Landmark, Users, Clock, AlertTriangle } from "lucide-react";
+import ActionMenu from "../common/ActionMenu";
 
-export default function AnnouncementItem({ item }) {
+export default function AnnouncementItem({ item, actions }) {
   const { data, college, club, createdAt } = item;
 
   // Calculate generic "time ago" string
@@ -13,17 +14,46 @@ export default function AnnouncementItem({ item }) {
     return `${Math.floor(diff / 1440)}d ago`;
   };
 
+  const isCritical = data.priority === 'critical';
   const isClub = !!club;
-  const entityName = isClub ? club.name : college?.name;
-  const entitySubtext = isClub ? `${college?.name}` : "Administration Dept.";
+
+  let entityName, entitySubtext, Icon, iconBgClass;
+
+  if (isCritical) {
+    entityName = "Inter-College Hub";
+    entitySubtext = "System Announcement";
+    Icon = AlertTriangle;
+    iconBgClass = "bg-red-50 border-red-100 text-red-600";
+  } else if (isClub) {
+    entityName = club.name;
+    entitySubtext = college?.name;
+    Icon = Users;
+    iconBgClass = "bg-purple-50 border-purple-100 text-purple-600";
+  } else {
+    // College Announcement
+    entityName = college?.name || "College Administration";
+    entitySubtext = "Administrative Dept.";
+    Icon = Landmark;
+    iconBgClass = "bg-slate-50 border-slate-100 text-slate-600";
+  }
 
   return (
-    <article className="rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 border-l-4 border-l-orange-500 p-5">
+    <article className={`rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 border-l-4 p-5 relative group ${isCritical ? 'border-l-red-500' : 'border-l-orange-500'
+      }`}>
+      {/* Admin Actions (Top Right) */}
+      {actions && (
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <ActionMenu
+            onDelete={actions.onDelete}
+            canDeleteOnly={true} // Announcements only delete
+          />
+        </div>
+      )}
+
       {/* Entity Info */}
       <div className="flex items-center gap-3 mb-4">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${isClub ? "bg-purple-50 border-purple-100 text-purple-600" : "bg-slate-50 border-slate-100 text-slate-600"
-          }`}>
-          {isClub ? <Users className="w-5 h-5" /> : <Landmark className="w-5 h-5" />}
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${iconBgClass}`}>
+          <Icon className="w-5 h-5" />
         </div>
         <div className="flex-1">
           <h4 className="text-sm font-bold text-gray-900 leading-tight">{entityName}</h4>
