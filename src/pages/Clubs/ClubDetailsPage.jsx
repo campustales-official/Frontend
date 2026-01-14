@@ -16,9 +16,9 @@ import DataError from "../../components/common/DataError";
 import CreatePostModal from "../../components/clubs/CreatePostModal";
 import CreateAnnouncementModal from "../../components/clubs/CreateAnnouncementModal";
 
-import { updateClubPost, deleteClubPost, deleteClubAnnouncement, joinClub } from "../../api/clubs.api";
+import { updateClubPost, deleteClubPost, deleteClubAnnouncement, joinClub, leaveClub } from "../../api/clubs.api";
 import EditPostModal from "../../components/clubs/EditPostModal";
-import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Linkedin, Plus, Clock, User, UserPlus, CheckCircle, Loader2, Pencil } from "lucide-react";
+import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Linkedin, Plus, Clock, User, UserPlus, CheckCircle, Loader2, Pencil, LogOut } from "lucide-react";
 
 export default function ClubDetailsPage() {
     const { clubId } = useParams();
@@ -63,6 +63,19 @@ export default function ClubDetailsPage() {
         },
         onError: (error) => {
             toast.error(error.response?.data?.message || "Failed to join club");
+        }
+    });
+
+    // Leave Mutation
+    const { mutate: handleLeave, isPending: leavePending } = useMutation({
+        mutationFn: () => leaveClub({ clubId }),
+        onSuccess: () => {
+            toast.success("Left club successfully");
+            queryClient.invalidateQueries({ queryKey: ["me"] });
+            queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+        },
+        onError: (error) => {
+            toast.error(error.response?.data?.message || "Failed to leave club");
         }
     });
 
@@ -188,6 +201,15 @@ export default function ClubDetailsPage() {
                                         Official
                                     </span>
                                 )}
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => navigate(`/club/${clubId}/edit`)}
+                                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                        title="Edit Club Details"
+                                    >
+                                        <Pencil className="w-4 h-4" />
+                                    </button>
+                                )}
                             </h1>
                             <div className="text-sm text-gray-500 font-medium mt-1">
                                 {club.college?.name || me?.college?.name} • Estd. {club.establishedYear}
@@ -201,7 +223,7 @@ export default function ClubDetailsPage() {
                                 <button
                                     onClick={() => !joinPending && handleJoin()}
                                     disabled={joinPending}
-                                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+                                    className="w-36 md:w-40 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition shadow-sm disabled:opacity-70 disabled:cursor-not-allowed shrink-0"
                                 >
                                     {joinPending ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -214,21 +236,24 @@ export default function ClubDetailsPage() {
                                 </button>
                             ) : (
                                 <button
-                                    disabled
-                                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-green-50 text-green-700 border border-green-200 px-6 py-2 rounded-lg font-medium shadow-sm cursor-default"
+                                    onClick={() => !leavePending && window.confirm("Are you sure you want to leave this club?") && handleLeave()}
+                                    disabled={leavePending}
+                                    className="w-36 md:w-40 flex items-center justify-center gap-2 bg-green-50 hover:bg-red-50 text-green-700 hover:text-red-600 border border-green-200 hover:border-red-200 px-6 py-2 rounded-lg font-medium shadow-sm transition-all group shrink-0"
                                 >
-                                    <CheckCircle className="w-4 h-4" />
-                                    <span>Joined</span>
-                                </button>
-                            )}
-
-                            {isAdmin && (
-                                <button
-                                    onClick={() => navigate(`/club/${clubId}/edit`)}
-                                    className="p-2 bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 rounded-lg font-medium transition shadow-sm"
-                                    title="Edit Club Details"
-                                >
-                                    <Pencil className="w-4 h-4" />
+                                    {leavePending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <div className="flex items-center gap-2 group-hover:hidden">
+                                                <CheckCircle className="w-4 h-4" />
+                                                <span>Joined</span>
+                                            </div>
+                                            <div className="hidden group-hover:flex items-center gap-2 text-red-600">
+                                                <LogOut className="w-4 h-4" />
+                                                <span>Leave</span>
+                                            </div>
+                                        </>
+                                    )}
                                 </button>
                             )}
 
@@ -392,6 +417,6 @@ export default function ClubDetailsPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

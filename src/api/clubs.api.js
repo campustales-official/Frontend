@@ -54,6 +54,11 @@ export const joinClub = async ({ collegeId, clubId }) => {
     return res.data;
 };
 
+export const leaveClub = async ({ clubId }) => {
+    const res = await axios.delete(`/clubs/${clubId}/leave`);
+    return res.data;
+};
+
 export const fetchClubMembers = async ({ clubId }) => {
     const res = await axios.get(`/clubs/${clubId}/members`);
     return res.data.data;

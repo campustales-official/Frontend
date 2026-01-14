@@ -55,8 +55,7 @@ export default function ForgotPasswordPage() {
 
     /* ---------- Step 3: Reset Password ---------- */
     const resetPasswordMutation = useMutation({
-        mutationFn: () => {
-            resetPassword(email, resetToken, newPassword)},
+        mutationFn: () => resetPassword(email, resetToken, newPassword),
         onSuccess: () => {
             toast.success("Password reset successful. Please login with your new password.");
             navigate("/login");
