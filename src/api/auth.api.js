@@ -17,3 +17,12 @@ export const verifyForgotPasswordOtp = (email, otp) =>
 
 export const resetPassword = (email, resetToken, newPassword) =>
   api.post("/auth/forgot-password/reset", { email, resetToken, newPassword });
+
+export const logout = () =>
+  api.post("/logout");
+
+export const changePassword = (data) =>
+  api.post("/change-password", data);
+
+export const changeEmail = (data) =>
+  api.post("/change-email", data);

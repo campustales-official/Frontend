@@ -16,6 +16,7 @@ import ClubsPage from "./pages/Clubs/ClubsPage";
 import ClubDetailsPage from "./pages/Clubs/ClubDetailsPage";
 import ClubMembersPage from "./pages/Clubs/ClubMembersPage";
 import EditClubPage from "./pages/Clubs/EditClubPage";
+import ProfilePage from "./pages/Auth/ProfilePage";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 function GuardedRoutes() {
@@ -82,7 +83,7 @@ function GuardedRoutes() {
         <Route path="club/:clubId" element={<ClubDetailsPage />} />
         <Route path="club/:clubId/members" element={<ClubMembersPage />} />
         <Route path="club/:clubId/edit" element={<EditClubPage />} />
-        {/* Add more nested routes here later for profile */}
+        <Route path="profile" element={<ProfilePage />} />
       </Route>
     </Routes>
   );

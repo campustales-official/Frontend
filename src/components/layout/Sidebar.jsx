@@ -25,8 +25,8 @@ export default function Sidebar() {
                                 key={link.name}
                                 to={link.path}
                                 className={`flex items-center gap-4 px-3 py-3 mx-2 rounded-lg transition-colors whitespace-nowrap ${isActive
-                                        ? "bg-blue-50 text-blue-600 font-medium"
-                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                    ? "bg-blue-50 text-blue-600 font-medium"
+                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                                     }`}
                             >
                                 <Icon className={`w-5 h-5 min-w-[20px] ${isActive ? "text-blue-600" : "text-gray-500"}`} />
