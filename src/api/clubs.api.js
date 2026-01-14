@@ -48,3 +48,31 @@ export const deleteClubAnnouncement = async ({ collegeId, clubId, announcementId
     const res = await axios.delete(`/colleges/${collegeId}/clubs/${clubId}/announcements/${announcementId}`);
     return res.data;
 };
+
+export const joinClub = async ({ collegeId, clubId }) => {
+    const res = await axios.post(`/colleges/${collegeId}/clubs/${clubId}/join`);
+    return res.data;
+};
+
+export const fetchClubMembers = async ({ clubId }) => {
+    const res = await axios.get(`/clubs/${clubId}/members`);
+    return res.data.data;
+};
+
+export const updateClubMember = async ({ collegeId, clubId, userId, roleInClub, positions }) => {
+    const res = await axios.patch(`/colleges/${collegeId}/clubs/${clubId}/members/${userId}`, { roleInClub, positions });
+    return res.data;
+};
+
+export const updateClubDetails = async ({ collegeId, clubId, data }) => {
+    // data should be FormData if images are included
+    const res = await axios.patch(`/colleges/${collegeId}/clubs/${clubId}`, data, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
+    return res.data;
+};
+
+export const removeClubMember = async ({ collegeId, clubId, userId }) => {
+    const res = await axios.delete(`/colleges/${collegeId}/clubs/${clubId}/members/${userId}`);
+    return res.data;
+};

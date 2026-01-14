@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchClubs } from "../../api/clubs.api"; // We can reuse or make a specific one
 import { useMe } from "../../hooks/useMe";
-import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Linkedin, Plus, Clock, User } from "lucide-react";
+// Lucide icons imported below with new additions
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 
@@ -16,8 +16,9 @@ import DataError from "../../components/common/DataError";
 import CreatePostModal from "../../components/clubs/CreatePostModal";
 import CreateAnnouncementModal from "../../components/clubs/CreateAnnouncementModal";
 
-import { updateClubPost, deleteClubPost, deleteClubAnnouncement } from "../../api/clubs.api";
+import { updateClubPost, deleteClubPost, deleteClubAnnouncement, joinClub } from "../../api/clubs.api";
 import EditPostModal from "../../components/clubs/EditPostModal";
+import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Linkedin, Plus, Clock, User, UserPlus, CheckCircle, Loader2, Pencil } from "lucide-react";
 
 export default function ClubDetailsPage() {
     const { clubId } = useParams();
@@ -51,6 +52,19 @@ export default function ClubDetailsPage() {
     // Check permission
     const myRoleObj = me?.clubRoles?.find(r => r.clubId === clubId);
     const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "superadmin" || me?.platformRole === "admin";
+    const isMember = !!myRoleObj; // If role obj exists, user is member/admin
+
+    // Join Mutation
+    const { mutate: handleJoin, isPending: joinPending } = useMutation({
+        mutationFn: () => joinClub({ collegeId, clubId }),
+        onSuccess: () => {
+            toast.success("Joined club successfully!");
+            queryClient.invalidateQueries({ queryKey: ["me"] });
+        },
+        onError: (error) => {
+            toast.error(error.response?.data?.message || "Failed to join club");
+        }
+    });
 
     // 3. Fetch Tab Content
     const feedTypes = activeTab === "posts" ? "post" : activeTab === "events" ? "event" : "announcement";
@@ -180,15 +194,48 @@ export default function ClubDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Action Buttons (Swapped as requested: Admin Left/First, Member Right/Second) */}
+                        {/* Action Buttons */}
                         <div className="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
-                            {isAdmin && (
-                                <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">
-                                    <Settings className="w-4 h-4" />
-                                    Admin Panel
+                            {/* Join Club Button */}
+                            {!isMember ? (
+                                <button
+                                    onClick={() => !joinPending && handleJoin()}
+                                    disabled={joinPending}
+                                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                    {joinPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <UserPlus className="w-4 h-4" />
+                                            <span>Join Club</span>
+                                        </div>
+                                    )}
+                                </button>
+                            ) : (
+                                <button
+                                    disabled
+                                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-green-50 text-green-700 border border-green-200 px-6 py-2 rounded-lg font-medium shadow-sm cursor-default"
+                                >
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span>Joined</span>
                                 </button>
                             )}
-                            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-4 py-2 rounded-lg font-medium transition shadow-sm">
+
+                            {isAdmin && (
+                                <button
+                                    onClick={() => navigate(`/club/${clubId}/edit`)}
+                                    className="p-2 bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 rounded-lg font-medium transition shadow-sm"
+                                    title="Edit Club Details"
+                                >
+                                    <Pencil className="w-4 h-4" />
+                                </button>
+                            )}
+
+                            <button
+                                onClick={() => navigate(`/club/${clubId}/members`)}
+                                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-4 py-2 rounded-lg font-medium transition shadow-sm"
+                            >
                                 <Users className="w-4 h-4" />
                                 Member List
                             </button>

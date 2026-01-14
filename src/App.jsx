@@ -13,6 +13,8 @@ import FeedPage from "./pages/Feed/FeedPage";
 import AnnouncementsPage from "./pages/Feed/AnnouncementsPage";
 import ClubsPage from "./pages/Clubs/ClubsPage";
 import ClubDetailsPage from "./pages/Clubs/ClubDetailsPage";
+import ClubMembersPage from "./pages/Clubs/ClubMembersPage";
+import EditClubPage from "./pages/Clubs/EditClubPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 function GuardedRoutes() {
@@ -65,10 +67,12 @@ function GuardedRoutes() {
 
       {/* Dashboard Routes */}
       <Route path="/" element={<DashboardLayout />}>
-        <Route index element={<FeedPage scope="college" collegeId={me.college.id} />} />
+        <Route index element={<FeedPage scope="global" collegeId={me.college.id} />} />
         <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college.id} />} />
         <Route path="clubs" element={<ClubsPage collegeId={me.college.id} />} />
         <Route path="club/:clubId" element={<ClubDetailsPage />} />
+        <Route path="club/:clubId/members" element={<ClubMembersPage />} />
+        <Route path="club/:clubId/edit" element={<EditClubPage />} />
         {/* Add more nested routes here later for profile */}
       </Route>
     </Routes>

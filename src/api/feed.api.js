@@ -13,6 +13,8 @@ export const fetchFeed = async ({ pageParam = null, queryKey }) => {
   if (types) params.types = types;
   if (eventStatus) params.eventStatus = eventStatus;
 
+  console.log(scope)
+
   // Map scope to visibility param if not global
   if (scope) {
     params.visibility = scope;
