@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useFeed } from "../../hooks/useFeed";
 import FeedItem from "../../components/feed/FeedItem";
 import FeedSkeleton from "../../components/feed/FeedSkeleton";
 import DataError from "../../components/common/DataError";
 
 export default function FeedPage({ scope = "college", clubId = null, collegeId }) {
+    const navigate = useNavigate();
     const {
         data,
         fetchNextPage,
@@ -56,6 +58,7 @@ export default function FeedPage({ scope = "college", clubId = null, collegeId }
     return (
         <div className="min-h-screen bg-gray-200">
             <div className="mx-auto w-full max-w-3xl px-4 py-6 flex flex-col gap-6">
+
                 {items.map((item) => (
                     <FeedItem key={`${item.type}-${item.id}`} item={item} />
                 ))}

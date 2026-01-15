@@ -42,7 +42,7 @@ export default function AnnouncementItem({ item, actions }) {
       }`}>
       {/* Admin Actions (Top Right) */}
       {actions && (
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-3 right-3">
           <ActionMenu
             onDelete={actions.onDelete}
             canDeleteOnly={true} // Announcements only delete

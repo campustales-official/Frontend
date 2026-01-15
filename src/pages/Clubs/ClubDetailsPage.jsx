@@ -97,7 +97,8 @@ export default function ClubDetailsPage() {
         clubId: clubId,
         collegeId: collegeId,
         types: feedTypes,
-        enabled: isFeedEnabled
+        enabled: isFeedEnabled,
+        eventStatus: "published"
     });
 
 
@@ -164,8 +165,7 @@ export default function ClubDetailsPage() {
         } else if (activeTab === 'announcements') {
             setIsAnnouncementOpen(true);
         } else if (activeTab === 'events') {
-            // Redirect for events
-            navigate(`/club/${clubId}/create-event`);
+            navigate(`/club/${clubId}/events/create`);
         }
     }
 
@@ -398,7 +398,11 @@ export default function ClubDetailsPage() {
                                         onDelete: () => handleAction('delete', item)
                                     } : undefined;
 
-                                    const itemWithActions = { ...item, actions: itemActions };
+                                    const itemWithActions = {
+                                        ...item,
+                                        actions: itemActions,
+                                        showManageButton: isAdmin && item.type === 'event'
+                                    };
 
                                     return <FeedItem key={item.id} item={itemWithActions} />;
                                 })}

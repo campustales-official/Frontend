@@ -1,0 +1,64 @@
+import axios from "../lib/axios";
+
+/**
+ * Helper to resolve the base path for events based on context (College or Club).
+ */
+const getBasePath = (collegeId, clubId) => {
+    if (clubId) {
+        return `/colleges/${collegeId}/clubs/${clubId}/events`;
+    }
+    return `/colleges/${collegeId}/events`;
+};
+
+export const createEvent = async ({ collegeId, clubId, formData }) => {
+    // formData should be a FormData object containing banner and other fields
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.post(basePath, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    console.log("CREATE EVENT RESPONSE:", res.data); // Debug log
+    return res.data.data;
+};
+
+export const updateEvent = async ({ collegeId, clubId, eventId, formData }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.patch(`${basePath}/${eventId}`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return res.data.data;
+};
+
+export const getEventDetails = async (eventId) => {
+    const res = await axios.get(`/events/${eventId}`);
+    // Handle different response structures
+    return res.data.data || res.data;
+};
+
+export const publishEvent = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.post(`${basePath}/${eventId}/publish`);
+    return res.data;
+};
+
+export const closeRegistration = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    console.log(basePath)
+    const res = await axios.post(`${basePath}/${eventId}/close-registration`);
+    return res.data;
+};
+
+export const completeEvent = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.post(`${basePath}/${eventId}/complete`);
+    return res.data;
+};
+
+export const deleteEvent = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.delete(`${basePath}/${eventId}`);
+    return res.data;
+};

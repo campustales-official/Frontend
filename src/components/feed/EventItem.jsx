@@ -1,23 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Share2, Bookmark } from "lucide-react";
-import { toast } from "react-toastify";
-import ActionMenu from "../common/ActionMenu";
+import { Calendar, MapPin, ArrowRight, Settings } from "lucide-react";
 
-export default function EventItem({ item, actions }) {
+export default function EventItem({ item, actions, showManageButton = false }) {
     const { data, college, club, id } = item;
     const navigate = useNavigate();
 
     return (
-        <article className="overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 flex flex-col sm:flex-row relative group">
-            {/* Admin Actions */}
-            {actions && (
-                <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-white/80 backdrop-blur rounded-full shadow-sm">
-                        <ActionMenu onEdit={actions.onEdit} onDelete={actions.onDelete} />
-                    </div>
-                </div>
-            )}
-
+        <article
+            className="overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 flex flex-col sm:flex-row relative group"
+        >
             {/* Left Image Section */}
             <div className="relative w-full sm:w-2/5 h-48 sm:h-auto bg-gray-100">
                 <img
@@ -34,7 +25,7 @@ export default function EventItem({ item, actions }) {
             {/* Right Content Section */}
             <div className="flex-1 p-5 flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-row-reverse sm:flex-row items-center justify-between mb-2">
                     <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-0.5 rounded-full">
                         Event
                     </span>
@@ -59,39 +50,24 @@ export default function EventItem({ item, actions }) {
                 </div>
 
                 {/* Actions */}
-                <div className="mt-auto flex justify-center">
-                    {(() => {
-                        const now = new Date();
-                        const startAt = new Date(data.registrationStartAt);
-                        const endAt = new Date(data.registrationEndAt);
-                        const isNotStarted = startAt > now;
-                        const isEnded = endAt < now;
+                <div className="mt-auto flex justify-center gap-3">
+                    {/* Explore Button - Always Visible */}
+                    <button
+                        onClick={() => navigate(`/events/${id}`)}
+                        className="flex-1 max-w-[160px] bg-blue-600 text-white font-semibold py-2 rounded-lg transition hover:bg-blue-700 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
+                    >
+                        Explore <ArrowRight className="w-4 h-4" />
+                    </button>
 
-                        return (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (isNotStarted) {
-                                        toast.info("Registration has not started yet");
-                                        return;
-                                    }
-                                    if (isEnded) {
-                                        toast.error("Registration has ended");
-                                        return;
-                                    }
-                                    navigate("/register");
-                                }}
-                                className={`w-full max-w-[200px] font-semibold py-2 rounded-lg transition active:scale-[0.98] text-sm ${isNotStarted
-                                    ? "bg-gray-100 text-gray-400 cursor-default"
-                                    : "bg-blue-600 text-white hover:bg-blue-700"
-                                    }`}
-                            >
-                                {isNotStarted
-                                    ? `Starts ${startAt.toLocaleTimeString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
-                                    : "Register Now"}
-                            </button>
-                        );
-                    })()}
+                    {/* Manage Button - Only for Admins in Club Context */}
+                    {showManageButton && actions && (
+                        <button
+                            onClick={() => navigate(`/events/${id}/manage`)}
+                            className="flex-1 max-w-[160px] bg-gray-900 text-white font-semibold py-2 rounded-lg transition hover:bg-gray-800 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
+                        >
+                            <Settings className="w-4 h-4" /> Manage
+                        </button>
+                    )}
                 </div>
             </div>
         </article>

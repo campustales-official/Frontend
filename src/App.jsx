@@ -19,6 +19,11 @@ import EditClubPage from "./pages/Clubs/EditClubPage";
 import ProfilePage from "./pages/Auth/ProfilePage";
 import DashboardLayout from "./layouts/DashboardLayout";
 
+// Events
+import CreateEventPage from "./pages/Events/CreateEventPage";
+import UpdateEventPage from "./pages/Events/UpdateEventPage";
+import EventManagementPage from "./pages/Events/EventManagementPage";
+
 function GuardedRoutes() {
   const location = useLocation();
   const { data: me, isLoading, isError } = useMe();
@@ -84,6 +89,12 @@ function GuardedRoutes() {
         <Route path="club/:clubId/members" element={<ClubMembersPage />} />
         <Route path="club/:clubId/edit" element={<EditClubPage />} />
         <Route path="profile" element={<ProfilePage />} />
+
+        {/* Event Management */}
+        <Route path="events/create" element={<CreateEventPage />} />
+        <Route path="club/:clubId/events/create" element={<CreateEventPage />} />
+        <Route path="events/:eventId/edit" element={<UpdateEventPage />} />
+        <Route path="events/:eventId/manage" element={<EventManagementPage />} />
       </Route>
     </Routes>
   );
