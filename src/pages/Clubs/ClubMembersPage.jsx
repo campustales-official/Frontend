@@ -1,18 +1,22 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchClubMembers, updateClubMember, removeClubMember } from "../../api/clubs.api";
+import { fetchClubMembers, updateClubMember, removeClubMember, leaveClub } from "../../api/clubs.api";
 import { useMe } from "../../hooks/useMe";
-import { ArrowLeft, MoreVertical, Loader2, Trash2, Edit2 } from "lucide-react";
+import { ArrowLeft, MoreVertical, Loader2, Trash2, Edit2, AlertTriangle } from "lucide-react";
 import { toast } from "react-toastify";
 import Modal from "../../components/common/Modal";
 
 export default function ClubMembersPage() {
     const { clubId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const queryClient = useQueryClient();
     const { data: me } = useMe();
     const collegeId = me?.college?.id;
+
+    // Check for succession mode
+    const allowAppointSuccessor = location.state?.appointSuccessor;
 
     // Fetch Members
     const { data: members, isLoading } = useQuery({
@@ -23,22 +27,41 @@ export default function ClubMembersPage() {
 
     // Admin Check
     const myRoleObj = me?.clubRoles?.find(r => r.clubId === clubId);
-    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "superadmin" || me?.platformRole === "admin";
+    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "super_admin";
 
     // Action State
     const [selectedMember, setSelectedMember] = useState(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [activeMenuId, setActiveMenuId] = useState(null);
 
+    // Leave Mutation
+    const { mutate: handleLeave } = useMutation({
+        mutationFn: () => leaveClub({ clubId }),
+        onSuccess: () => {
+            toast.success("Successor appointed. You have successfully left the club.");
+            navigate(`/club/${clubId}`); // Go to club page (user will see Join button)
+            queryClient.invalidateQueries({ queryKey: ["me"] });
+        },
+        onError: (error) => {
+            toast.error(error.response?.data?.message || "Failed to leave club automatically. Please leave manually.");
+        }
+    });
+
     // Mutations
     const { mutate: updateMember, isPending: isUpdating } = useMutation({
         mutationFn: ({ userId, roleInClub, positions }) =>
             updateClubMember({ collegeId, clubId, userId, roleInClub, positions }),
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             toast.success("Member updated successfully");
+            queryClient.invalidateQueries({ queryKey: ["me"] });
             queryClient.invalidateQueries({ queryKey: ["clubMembers", clubId] });
             setIsEditOpen(false);
             setSelectedMember(null);
+
+            // Auto-exit if successor appointed
+            if (allowAppointSuccessor && variables.roleInClub === "super_admin") {
+                handleLeave();
+            }
         },
         onError: (err) => toast.error(err.response?.data?.message || "Update failed")
     });
@@ -48,6 +71,7 @@ export default function ClubMembersPage() {
         onSuccess: () => {
             toast.success("Member removed successfully");
             queryClient.invalidateQueries({ queryKey: ["clubMembers", clubId] });
+            queryClient.invalidateQueries({ queryKey: ["me"] });
         },
         onError: (err) => toast.error(err.response?.data?.message || "Removal failed")
     });
@@ -102,6 +126,17 @@ export default function ClubMembersPage() {
                         <p className="text-gray-500 text-sm">Manage roles and permissions</p>
                     </div>
                 </div>
+
+                {/* Succession Banner */}
+                {allowAppointSuccessor && (
+                    <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3 text-amber-800 shadow-sm animate-pulse ring-1 ring-amber-300">
+                        <AlertTriangle className="w-5 h-5 shrink-0" />
+                        <div>
+                            <p className="font-bold">Action Required: Appoint Successor</p>
+                            <p className="text-sm">Please appoint a new <span className="font-bold">Super Admin</span> from the list below. Once appointed, you will be able to leave the club.</p>
+                        </div>
+                    </div>
+                )}
 
                 {/* List */}
                 {isLoading ? (
@@ -209,13 +244,14 @@ export default function ClubMembersPage() {
                     member={selectedMember}
                     onSave={updateMember}
                     isPending={isUpdating}
+                    allowAppointSuccessor={allowAppointSuccessor}
                 />
             )}
         </div>
     );
 }
 
-function EditMemberModal({ isOpen, onClose, member, onSave, isPending }) {
+function EditMemberModal({ isOpen, onClose, member, onSave, isPending, allowAppointSuccessor }) {
     const [roleInClub, setRoleInClub] = useState(member.roleInClub);
     const [position, setPosition] = useState(member.positions?.[0] || "");
 
@@ -240,7 +276,7 @@ function EditMemberModal({ isOpen, onClose, member, onSave, isPending }) {
                         <option value="member">Member</option>
                         <option value="assistant">Assistant</option>
                         <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
+                        {allowAppointSuccessor && <option value="super_admin">Super Admin</option>}
                     </select>
                 </div>
                 <div>

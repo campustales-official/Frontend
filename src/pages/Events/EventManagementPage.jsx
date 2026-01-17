@@ -78,9 +78,11 @@ export default function EventManagementPage() {
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Event Lifecycle Management</p>
                         </div>
                     </div>
-                    <Link to={`/events/${eventId}/edit`} className="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-gray-800 transition">
-                        <Edit3 className="w-4 h-4" /> Edit Event
-                    </Link>
+                    {event.status === "draft" && (
+                        <Link to={`/events/${eventId}/edit`} className="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-gray-800 transition">
+                            <Edit3 className="w-4 h-4" /> Edit Event
+                        </Link>
+                    )}
                 </div>
             </div>
 

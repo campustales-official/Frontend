@@ -51,7 +51,7 @@ export default function ClubDetailsPage() {
 
     // Check permission
     const myRoleObj = me?.clubRoles?.find(r => r.clubId === clubId);
-    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "superadmin" || me?.platformRole === "admin";
+    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "super_admin";
     const isMember = !!myRoleObj; // If role obj exists, user is member/admin
 
     // Join Mutation
@@ -170,6 +170,23 @@ export default function ClubDetailsPage() {
     }
 
 
+    const handleLeaveClick = () => {
+        if (leavePending) return;
+
+        // Check if user is super_admin (using standard role name)
+        const isSuperAdmin = myRoleObj?.role === "super_admin" || myRoleObj?.role === "superadmin";
+
+        if (isSuperAdmin) {
+            toast.warning("As a Super Admin, you must appoint a new Super Admin from the Member List before leaving.");
+            navigate(`/club/${clubId}/members`, { state: { appointSuccessor: true } });
+            return;
+        }
+
+        if (window.confirm("Are you sure you want to leave this club?")) {
+            handleLeave();
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-200 pb-20">
             {/* Header Section */}
@@ -236,7 +253,7 @@ export default function ClubDetailsPage() {
                                 </button>
                             ) : (
                                 <button
-                                    onClick={() => !leavePending && window.confirm("Are you sure you want to leave this club?") && handleLeave()}
+                                    onClick={handleLeaveClick}
                                     disabled={leavePending}
                                     className="w-36 md:w-40 flex items-center justify-center gap-2 bg-green-50 hover:bg-red-50 text-green-700 hover:text-red-600 border border-green-200 hover:border-red-200 px-6 py-2 rounded-lg font-medium shadow-sm transition-all group shrink-0"
                                 >
