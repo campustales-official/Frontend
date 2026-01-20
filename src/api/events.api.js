@@ -134,3 +134,17 @@ export const cancelRegistration = async (registrationId) => {
     const res = await axios.post(`/registrations/${registrationId}/cancel`);
     return res.data.data || res.data;
 };
+
+export const getRegistrationTable = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.get(`${basePath}/${eventId}/registrations/table`);
+    return res.data;
+};
+
+export const downloadRegistrationsExcel = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.get(`${basePath}/${eventId}/registrations/export`, {
+        responseType: "blob",
+    });
+    return res.data;
+};

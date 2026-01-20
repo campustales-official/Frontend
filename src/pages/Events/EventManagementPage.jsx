@@ -7,9 +7,13 @@ import {
     Calendar, MapPin, Users, BarChart3, Clock,
     CheckCircle2, XCircle, Trash2, Edit3, Loader2,
     ArrowLeft, ExternalLink, Zap, ShieldAlert, AlertTriangle, Send,
-    Search, Filter, ChevronLeft, ChevronRight, MoreVertical, CheckCircle
+    Search, Filter, ChevronLeft, ChevronRight, MoreVertical, CheckCircle,
+    Eye, FileSpreadsheet
 } from "lucide-react";
-import { getEventDetails, publishEvent, closeRegistration, completeEvent, deleteEvent, getEventRegistrations } from "../../api/events.api";
+import {
+    getEventDetails, publishEvent, closeRegistration, completeEvent,
+    deleteEvent, getEventRegistrations, downloadRegistrationsExcel
+} from "../../api/events.api";
 
 export default function EventManagementPage() {
     const navigate = useNavigate();
@@ -71,6 +75,30 @@ export default function EventManagementPage() {
             toast.error(err.response?.data?.message || "Action failed");
         }
     });
+
+    const [isExporting, setIsExporting] = useState(false);
+    const handleExport = async () => {
+        if (isExporting) return;
+        setIsExporting(true);
+        const loadingToast = toast.loading("Preparing Excel file...");
+        try {
+            const data = await downloadRegistrationsExcel({ collegeId, clubId, eventId });
+            const blob = new Blob([data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `registrations-${event?.title || 'event'}.xlsx`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            toast.update(loadingToast, { render: "Excel downloaded successfully!", type: "success", isLoading: false, autoClose: 3000 });
+        } catch (err) {
+            toast.update(loadingToast, { render: "Export failed. Please try again.", type: "error", isLoading: false, autoClose: 3000 });
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     if (isLoading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-blue-600" /></div>;
     if (isError) return <div className="p-10 text-center font-bold text-red-500">Event not found or access denied.</div>;
@@ -191,25 +219,46 @@ export default function EventManagementPage() {
                     {/* Registrations List */}
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="p-8 pb-4">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                                <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
-                                    Registrations
-                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-black ring-4 ring-blue-50">
-                                        {event.registrationCount || 0} Total
-                                    </span>
-                                </h3>
-                                <div className="flex items-center gap-3">
-                                    {/* Search */}
-                                    <div className="relative group flex-1 md:w-64">
-                                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
-                                        <input
-                                            type="text"
-                                            placeholder="Search name or email..."
-                                            value={search}
-                                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
-                                        />
-                                    </div>
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                                <div>
+                                    <h3 className="text-2xl font-black text-gray-900 flex items-center gap-3">
+                                        Registrations
+                                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-wider ring-4 ring-blue-50">
+                                            {event.registrationCount || 0} Total
+                                        </span>
+                                    </h3>
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Manage and track participant entries</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => navigate(`/events/${eventId}/registrations/live`)}
+                                        className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 text-gray-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 border border-gray-200 transition active:scale-95 shadow-sm"
+                                    >
+                                        <Eye className="w-4 h-4 text-gray-400" />
+                                        Live Grid
+                                    </button>
+                                    <button
+                                        onClick={handleExport}
+                                        disabled={isExporting}
+                                        className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition disabled:opacity-50 shadow-lg shadow-blue-500/20 active:scale-95"
+                                    >
+                                        <FileSpreadsheet className="w-4 h-4" />
+                                        {isExporting ? 'Exporting...' : 'Download Excel'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col md:flex-row gap-4 items-center">
+                                {/* Search */}
+                                <div className="relative group flex-1 w-full">
+                                    <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search participant by name or email address..."
+                                        value={search}
+                                        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                                        className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-medium"
+                                    />
                                 </div>
                             </div>
                         </div>

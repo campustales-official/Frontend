@@ -28,6 +28,7 @@ import EventDetailsPage from "./pages/Events/EventDetailsPage";
 import EventRegistrationPage from "./pages/Events/EventRegistrationPage";
 import RegistrationDetailPage from "./pages/Events/RegistrationDetailPage";
 import MyRegistrationPage from "./pages/Events/MyRegistrationPage";
+import EventRegistrationsLivePage from "./pages/Events/EventRegistrationsLivePage";
 
 function GuardedRoutes() {
   const location = useLocation();
@@ -106,6 +107,7 @@ function GuardedRoutes() {
         <Route path="events/:eventId/manage" element={<EventManagementPage />} />
         <Route path="events/:eventId/registrations/:registrationId" element={<RegistrationDetailPage />} />
         <Route path="my-registrations/:registrationId" element={<MyRegistrationPage />} />
+        <Route path="events/:eventId/registrations/live" element={<EventRegistrationsLivePage />} />
       </Route>
     </Routes>
   );
