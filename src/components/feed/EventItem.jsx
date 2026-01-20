@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, ArrowRight, Settings } from "lucide-react";
+import { Calendar, MapPin, ArrowRight, Settings, FileText, Download } from "lucide-react";
 
 export default function EventItem({ item, actions, showManageButton = false }) {
     const { data, college, club, id, showExploreButton = true } = item;
@@ -75,25 +75,50 @@ export default function EventItem({ item, actions, showManageButton = false }) {
                 </div>
 
                 {/* Actions */}
-                <div className="mt-auto flex justify-center gap-3">
-                    {/* Explore Button - Conditional */}
-                    {showExploreButton && (
-                        <button
-                            onClick={() => navigate(`/events/${id}`)}
-                            className="flex-1 max-w-[160px] bg-blue-600 text-white font-semibold py-2 rounded-lg transition hover:bg-blue-700 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
-                        >
-                            Explore <ArrowRight className="w-4 h-4" />
-                        </button>
-                    )}
+                <div className="mt-auto flex flex-wrap gap-2 justify-center">
+                    {/* Registered Actions */}
+                    {data.registrationId ? (
+                        <>
+                            <button
+                                onClick={() => navigate(`/my-registrations/${data.registrationId}`)}
+                                className="flex-1 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition hover:bg-blue-700 active:scale-[0.98] text-xs flex items-center justify-center gap-2 group/btn"
+                            >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>View Registration</span>
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    import("react-toastify").then(({ toast }) => toast.info("Certificate will be available after the event completes."));
+                                }}
+                                className="bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded-lg transition hover:bg-gray-200 active:scale-[0.98] text-xs flex items-center justify-center gap-2"
+                            >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Certificate</span>
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            {/* Explore Button - Conditional */}
+                            {showExploreButton && (
+                                <button
+                                    onClick={() => navigate(`/events/${id}`)}
+                                    className="flex-1 max-w-[160px] bg-blue-600 text-white font-semibold py-2 rounded-lg transition hover:bg-blue-700 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
+                                >
+                                    Explore <ArrowRight className="w-4 h-4" />
+                                </button>
+                            )}
 
-                    {/* Manage Button - Only for Admins in Club Context */}
-                    {showManageButton && actions && (
-                        <button
-                            onClick={() => navigate(`/events/${id}/manage`)}
-                            className="flex-1 max-w-[160px] bg-gray-900 text-white font-semibold py-2 rounded-lg transition hover:bg-gray-800 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
-                        >
-                            <Settings className="w-4 h-4" /> Manage
-                        </button>
+                            {/* Manage Button - Only for Admins in Club Context */}
+                            {showManageButton && actions && (
+                                <button
+                                    onClick={() => navigate(`/events/${id}/manage`)}
+                                    className="flex-1 max-w-[160px] bg-gray-900 text-white font-semibold py-2 rounded-lg transition hover:bg-gray-800 active:scale-[0.98] text-sm flex items-center justify-center gap-2"
+                                >
+                                    <Settings className="w-4 h-4" /> Manage
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

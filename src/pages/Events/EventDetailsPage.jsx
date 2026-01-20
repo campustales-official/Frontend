@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getEventDetails } from "../../api/events.api";
-import { Calendar, MapPin, Clock, Share2, User, Info, ArrowRight, Loader2 } from "lucide-react";
+import { Calendar, MapPin, Clock, Share2, User, Info, ArrowRight, Loader2, ArrowLeft } from "lucide-react";
 import { useMe } from "../../hooks/useMe";
 import { toast } from "react-toastify";
 
@@ -74,6 +74,14 @@ export default function EventDetailsPage() {
         <div className="min-h-screen bg-gray-50 pb-20">
             {/* 1. Clean Banner Image */}
             <div className="h-[40vh] md:h-[50vh] w-full bg-gray-200 overflow-hidden relative">
+                {/* Floating Back Button */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="absolute top-6 left-6 z-10 p-3 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white transition-all border border-white/20 shadow-xl"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </button>
+
                 {event.bannerImageUrl ? (
                     <img
                         src={event.bannerImageUrl}

@@ -73,7 +73,7 @@ export default function RegistrationDetailPage() {
             <div className="bg-white border-b sticky top-0 z-20">
                 <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition"><ArrowLeft className="w-5 h-5" /></button>
+                        <button onClick={() => navigate(`/events/${eventId}/manage`)} className="p-2 hover:bg-gray-100 rounded-full transition"><ArrowLeft className="w-5 h-5" /></button>
                         <div>
                             <h1 className="text-lg font-black text-gray-900 leading-none">Participant Profile</h1>
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Event: {reg.event.title}</p>
@@ -205,7 +205,7 @@ export default function RegistrationDetailPage() {
                                                 {getQuestionLabel(ans.questionKey)}
                                             </p>
                                             <div className="text-gray-900 font-bold whitespace-pre-wrap leading-relaxed">
-                                                {ans.answer.startsWith('http') ? (
+                                                {typeof ans.answer === 'string' && ans.answer.startsWith('http') ? (
                                                     <div className="mt-2 p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between border-dashed">
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">

@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { ArrowLeft, Loader2, Info, CheckCircle2, AlertCircle } from "lucide-react";
 
-import { getEventDetails, registerForEvent } from "../../api/events.api";
+import { getEventDetails, registerForEvent, updateRegistration } from "../../api/events.api";
 import { useMe } from "../../hooks/useMe";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function EventRegistrationPage() {
     const { eventId } = useParams();
@@ -19,30 +21,53 @@ export default function EventRegistrationPage() {
         queryFn: () => getEventDetails(eventId),
         enabled: !!eventId
     });
+    const { state } = useLocation();
+    const editRegistration = state?.editRegistration;
 
     // Form State for dynamic answers
     // Map questionKey -> value
     const [answers, setAnswers] = useState({});
 
+    useEffect(() => {
+        if (editRegistration?.answers) {
+            const initialAnswers = {};
+            editRegistration.answers.forEach(ans => {
+                initialAnswers[ans.questionKey] = ans;
+            });
+            setAnswers(initialAnswers);
+        }
+    }, [editRegistration]);
+
     const { mutate: handleRegister, isPending } = useMutation({
         mutationFn: async () => {
-            // Transform answers to API format
             const formattedAnswers = Object.values(answers);
 
+            if (editRegistration) {
+                const regId = editRegistration.id || editRegistration._id || editRegistration.registrationId;
+                return updateRegistration(regId, {
+                    answers: formattedAnswers
+                });
+            }
+
             return registerForEvent({
-                collegeId: me?.college?.id, // Assuming user's college context for now, or could trust API to resolve
-                clubId: event?.club?.id,    // Pass clubId if it exists
+                collegeId: me?.college?.id,
+                clubId: event?.club?.id,
                 eventId,
                 answers: formattedAnswers,
-                visibility: event?.visibility // Pass visibility to help API choose endpoint
+                visibility: event?.visibility
             });
         },
         onSuccess: () => {
-            toast.success("Successfully registered!");
-            // Invalidate queries to update UI elsewhere if needed
+            const regId = editRegistration?.id || editRegistration?._id || editRegistration?.registrationId;
+            toast.success(editRegistration ? "Registration updated!" : "Successfully registered!");
             queryClient.invalidateQueries({ queryKey: ["my-events"] });
-            // Redirect to event details
-            navigate(`/events/${eventId}`);
+            if (regId) queryClient.invalidateQueries({ queryKey: ["registration", regId] });
+
+            if (editRegistration && regId) {
+                navigate(`/my-registrations/${regId}`);
+            } else {
+                navigate(`/events/${eventId}`);
+            }
         },
         onError: (error) => {
             toast.error(error.response?.data?.message || "Registration failed. Please try again.");
@@ -104,8 +129,12 @@ export default function EventRegistrationPage() {
                     {/* Header */}
                     <div className="bg-gray-900 px-8 py-10 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-                        <h1 className="text-3xl font-bold text-white mb-2 relative z-10">Event Registration</h1>
-                        <p className="text-gray-400 font-medium relative z-10">Complete the form below to secure your spot.</p>
+                        <h1 className="text-3xl font-bold text-white mb-2 relative z-10">
+                            {editRegistration ? "Update Registration" : "Event Registration"}
+                        </h1>
+                        <p className="text-gray-400 font-medium relative z-10">
+                            {editRegistration ? "Update your form responses below." : "Complete the form below to secure your spot."}
+                        </p>
                     </div>
 
                     <div className="p-8">
@@ -261,11 +290,11 @@ export default function EventRegistrationPage() {
                                     {isPending ? (
                                         <>
                                             <Loader2 className="w-5 h-5 animate-spin" />
-                                            Registering...
+                                            {editRegistration ? "Updating..." : "Registering..."}
                                         </>
                                     ) : (
                                         <>
-                                            Confirm Registration
+                                            {editRegistration ? "Update Registration" : "Confirm Registration"}
                                             <CheckCircle2 className="w-5 h-5" />
                                         </>
                                     )}

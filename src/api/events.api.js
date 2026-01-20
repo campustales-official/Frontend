@@ -100,7 +100,37 @@ export const getEventRegistrations = async ({ collegeId, clubId, eventId, page =
 };
 
 export const getRegistrationDetails = async ({ collegeId, clubId, eventId, registrationId }) => {
+    // Student view (Self): Just use registrationId
+    if (!eventId || !collegeId) {
+        const res = await axios.get(`/registrations/${registrationId}`);
+        return res.data.data || res.data;
+    }
+
+    // Admin view: Use full path
     const basePath = getBasePath(collegeId, clubId);
     const res = await axios.get(`${basePath}/${eventId}/registrations/${registrationId}`);
+    return res.data.data || res.data;
+};
+
+export const updateRegistration = async (registrationId, data) => {
+    const formData = new FormData();
+
+    if (data.answers && data.answers.length > 0) {
+        data.answers.forEach((ans, index) => {
+            formData.append(`answers[${index}][questionKey]`, ans.questionKey);
+            formData.append(`answers[${index}][answer]`, ans.answer);
+        });
+    }
+
+    const res = await axios.patch(`/registrations/${registrationId}`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return res.data.data || res.data;
+};
+
+export const cancelRegistration = async (registrationId) => {
+    const res = await axios.post(`/registrations/${registrationId}/cancel`);
     return res.data.data || res.data;
 };

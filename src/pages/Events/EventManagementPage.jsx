@@ -75,8 +75,6 @@ export default function EventManagementPage() {
     if (isLoading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-blue-600" /></div>;
     if (isError) return <div className="p-10 text-center font-bold text-red-500">Event not found or access denied.</div>;
 
-    // Extract clubId - handle different backend response structures
-    console.log("EVENT MANAGEMENT - clubId:", clubId, "collegeId:", collegeId); // Debug
     const commonParams = { collegeId, clubId, eventId };
 
     const statusColors = {
@@ -93,7 +91,15 @@ export default function EventManagementPage() {
             <div className="bg-white border-b sticky top-0 z-20">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition"><ArrowLeft className="w-5 h-5" /></button>
+                        <button
+                            onClick={() => {
+                                if (clubId) navigate(`/club/${clubId}`);
+                                else navigate("/");
+                            }}
+                            className="p-2 hover:bg-gray-100 rounded-full transition"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
                         <div>
                             <h1 className="text-lg font-black text-gray-900 leading-none">Organizer Console</h1>
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Event Lifecycle Management</p>
@@ -186,7 +192,12 @@ export default function EventManagementPage() {
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="p-8 pb-4">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                                <h3 className="text-xl font-black text-gray-900">Registrations</h3>
+                                <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+                                    Registrations
+                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-black ring-4 ring-blue-50">
+                                        {event.registrationCount || 0} Total
+                                    </span>
+                                </h3>
                                 <div className="flex items-center gap-3">
                                     {/* Search */}
                                     <div className="relative group flex-1 md:w-64">
@@ -199,21 +210,6 @@ export default function EventManagementPage() {
                                             className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
                                         />
                                     </div>
-                                    {/* Status Filter */}
-                                    <div className="relative">
-                                        <select
-                                            value={statusFilter}
-                                            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-                                            className="appearance-none pl-4 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
-                                        >
-                                            <option value="">Status: All</option>
-                                            <option value="registered">Registered</option>
-                                            <option value="confirmed">Confirmed</option>
-                                            <option value="waitlisted">Waitlisted</option>
-                                            <option value="cancelled">Cancelled</option>
-                                        </select>
-                                        <Filter className="w-3.5 h-3.5 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -225,21 +221,20 @@ export default function EventManagementPage() {
                                         <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest min-w-[200px]">Participant Name</th>
                                         <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Email Address</th>
                                         <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Checked-in</th>
                                         <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50 text-sm">
                                     {regsLoading ? (
                                         <tr>
-                                            <td colSpan="5" className="px-8 py-12 text-center">
+                                            <td colSpan="4" className="px-8 py-12 text-center">
                                                 <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto" />
                                                 <p className="text-xs font-bold text-gray-400 mt-2 uppercase tracking-widest">Fetching Registrations...</p>
                                             </td>
                                         </tr>
                                     ) : !regData?.registrations?.length ? (
                                         <tr>
-                                            <td colSpan="5" className="px-8 py-12 text-center">
+                                            <td colSpan="4" className="px-8 py-12 text-center">
                                                 <div className="text-gray-300 mb-2 font-black text-3xl opacity-20 uppercase tracking-tighter italic">No Data</div>
                                                 <p className="text-sm font-bold text-gray-400">No registrations found for this event.</p>
                                             </td>
@@ -269,17 +264,6 @@ export default function EventManagementPage() {
                                                         }`}>
                                                         {reg.status}
                                                     </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    {reg.attended ? (
-                                                        <div className="inline-flex p-1 bg-green-100 text-green-600 rounded-full">
-                                                            <CheckCircle className="w-4 h-4" />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="inline-flex p-1 bg-gray-100 text-gray-300 rounded-full">
-                                                            <CheckCircle className="w-4 h-4" />
-                                                        </div>
-                                                    )}
                                                 </td>
                                                 <td className="px-8 py-4 text-right">
                                                     <div className="flex justify-end gap-2">
