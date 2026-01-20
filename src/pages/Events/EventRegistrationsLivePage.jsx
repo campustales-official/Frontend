@@ -6,8 +6,9 @@ import {
     Table as TableIcon, LayoutList, FileSpreadsheet, ExternalLink
 } from "lucide-react";
 import { useMe } from "../../hooks/useMe";
-import { getEventDetails, getRegistrationTable, downloadRegistrationsExcel } from "../../api/events.api";
+import { getEventDetails, getRegistrationTable, downloadRegistrationsExcel, generateCertificate } from "../../api/events.api";
 import { useState } from "react";
+import { Award, Zap } from "lucide-react";
 
 export default function EventRegistrationsLivePage() {
     const navigate = useNavigate();
@@ -61,6 +62,17 @@ export default function EventRegistrationsLivePage() {
             setIsExporting(false);
         }
     };
+
+    const { mutate: handleGenerate, isPending: generatePending } = useMutation({
+        mutationFn: ({ regId }) => generateCertificate({ collegeId, clubId, eventId, registrationId: regId }),
+        onSuccess: () => {
+            toast.success("Certificate generated successfully!");
+            queryClient.invalidateQueries({ queryKey: ["registrations-table", eventId] });
+        },
+        onError: (err) => {
+            toast.error(err.response?.data?.message || "Generation failed. Ensure template exists.");
+        }
+    });
 
     if (eventLoading || tableLoading) {
         return (
@@ -152,6 +164,9 @@ export default function EventRegistrationsLivePage() {
                                             {col.label}
                                         </th>
                                     ))}
+                                    <th className="px-6 py-4 text-center text-[11px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 sticky right-0 z-20 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.05)]">
+                                        Certificate
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
@@ -188,6 +203,24 @@ export default function EventRegistrationsLivePage() {
                                                 </td>
                                             );
                                         })}
+
+                                        <td className="px-6 py-4 text-sm font-bold border-l border-gray-100/50 whitespace-nowrap sticky right-0 bg-white group-hover:bg-blue-50/50 z-20 shadow-[-10px_0_15px_-5px_rgba(0,0,0,0.05)] text-center">
+                                            {row.certificateId ? (
+                                                <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 inline-flex">
+                                                    <Award className="w-3.5 h-3.5" />
+                                                    <span className="text-[10px] uppercase font-black tracking-widest text-[8px]">Issued</span>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleGenerate({ regId: row.id || row._id })}
+                                                    disabled={generatePending}
+                                                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-gray-800 transition disabled:opacity-50"
+                                                >
+                                                    <Zap className="w-3 h-3 text-yellow-400" />
+                                                    {generatePending ? 'Wait...' : 'Issue'}
+                                                </button>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

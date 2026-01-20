@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, ArrowRight, Settings, FileText, Download } from "lucide-react";
+import { Calendar, MapPin, ArrowRight, Settings, FileText, Download, Award } from "lucide-react";
+import { getCertificateDownloadUrl } from "../../api/events.api";
 
 export default function EventItem({ item, actions, showManageButton = false }) {
     const { data, college, club, id, showExploreButton = true } = item;
@@ -86,16 +87,29 @@ export default function EventItem({ item, actions, showManageButton = false }) {
                                 <FileText className="w-3.5 h-3.5" />
                                 <span>View Registration</span>
                             </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    import("react-toastify").then(({ toast }) => toast.info("Certificate will be available after the event completes."));
-                                }}
-                                className="bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded-lg transition hover:bg-gray-200 active:scale-[0.98] text-xs flex items-center justify-center gap-2"
-                            >
-                                <Download className="w-3.5 h-3.5" />
-                                <span>Certificate</span>
-                            </button>
+                            {data.certificateId ? (
+                                <a
+                                    href={getCertificateDownloadUrl(data.certificateId)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition hover:bg-green-700 active:scale-[0.98] text-xs flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+                                >
+                                    <Award className="w-3.5 h-3.5" />
+                                    <span>Download Cert</span>
+                                </a>
+                            ) : (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        import("react-toastify").then(({ toast }) => toast.info("Certificate will be available after the event completes."));
+                                    }}
+                                    className="bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded-lg transition hover:bg-gray-200 active:scale-[0.98] text-xs flex items-center justify-center gap-2"
+                                >
+                                    <Download className="w-3.5 h-3.5" />
+                                    <span>Certificate</span>
+                                </button>
+                            )}
                         </>
                     ) : (
                         <>
@@ -122,6 +136,6 @@ export default function EventItem({ item, actions, showManageButton = false }) {
                     )}
                 </div>
             </div>
-        </article>
+        </article >
     );
 }

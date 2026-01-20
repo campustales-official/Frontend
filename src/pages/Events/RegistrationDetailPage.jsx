@@ -7,14 +7,33 @@ import {
     CheckCircle2, XCircle, FileText, Download, ExternalLink, Loader2, School
 } from "lucide-react";
 import { useMe } from "../../hooks/useMe";
-import { getRegistrationDetails, getEventDetails } from "../../api/events.api";
+import { getRegistrationDetails, getEventDetails, generateCertificate } from "../../api/events.api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Award, Zap } from "lucide-react";
 
 export default function RegistrationDetailPage() {
     const navigate = useNavigate();
     const { eventId, registrationId } = useParams();
     const { state } = useLocation();
     const { data: me } = useMe();
+    const queryClient = useQueryClient();
     const collegeId = me?.college?.id;
+
+    const { mutate: handleGenerate, isPending: generatePending } = useMutation({
+        mutationFn: () => generateCertificate({
+            collegeId,
+            clubId: state?.clubId || event?.club?._id || event?.club?.id,
+            eventId,
+            registrationId
+        }),
+        onSuccess: () => {
+            toast.success("Certificate generated successfully!");
+            queryClient.invalidateQueries({ queryKey: ["registration", registrationId] });
+        },
+        onError: (err) => {
+            toast.error(err.response?.data?.message || "Generation failed. Ensure template exists.");
+        }
+    });
 
     // Prev/Next logic from state
     const registrationIds = state?.registrationIds || [];
@@ -169,6 +188,39 @@ export default function RegistrationDetailPage() {
                                     <p className="text-sm font-black leading-none">Attendance</p>
                                     <p className="text-[10px] font-bold mt-1 uppercase tracking-wider">{reg.attended ? 'MARKED AS PRESENT' : 'NOT CHECKED-IN'}</p>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Certificate Generation Card */}
+                        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden relative group">
+                            <div className="flex flex-col gap-4">
+                                <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                                    <Award className="w-4 h-4 text-yellow-600" /> Certificate
+                                </h3>
+
+                                {reg.certificateId ? (
+                                    <div className="p-4 rounded-2xl bg-green-50 text-green-700 border border-green-100 flex items-center gap-3">
+                                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                                        <div>
+                                            <p className="text-xs font-black uppercase tracking-wider">CERTIFICATE ISSUED</p>
+                                            <p className="text-[10px] font-bold opacity-70 mt-0.5">Participant has received their award.</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <p className="text-xs font-bold text-gray-400 leading-relaxed italic">
+                                            No certificate has been generated for this participant yet.
+                                        </p>
+                                        <button
+                                            onClick={() => handleGenerate()}
+                                            disabled={generatePending}
+                                            className="w-full flex items-center justify-center gap-3 py-3 bg-gray-900 text-white rounded-xl text-xs font-black uppercase tracking-[0.1em] hover:bg-gray-800 transition disabled:opacity-50 shadow-lg active:scale-95"
+                                        >
+                                            {generatePending ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <Zap className="w-4 h-4 text-yellow-400 fill-yellow-400" />}
+                                            {generatePending ? 'Generating...' : 'Issue Certificate Now'}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

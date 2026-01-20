@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
     Info, Calendar, MapPin, Eye, Upload, Plus,
     Trash2, ChevronDown, CheckCircle2, AlertCircle,
-    Type, AlignLeft, Hash, List, FileText
+    Type, AlignLeft, Hash, List, FileText, Award
 } from "lucide-react";
 
 const QUESTION_TYPES = [
@@ -306,8 +306,8 @@ export default function EventFormBase({
                                             type="button"
                                             onClick={() => toggleUserField(field.value)}
                                             className={`p-3 rounded-xl border-2 text-left transition ${isSelected
-                                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                    : 'border-gray-100 bg-gray-50/50 text-gray-600 hover:border-gray-200'
+                                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                : 'border-gray-100 bg-gray-50/50 text-gray-600 hover:border-gray-200'
                                                 }`}
                                         >
                                             <div className="flex items-center justify-between mb-1">
@@ -433,6 +433,33 @@ export default function EventFormBase({
                                     onChange={handleFileChange}
                                 />
                             </div>
+                        </div>
+                    </section>
+
+                    {/* Certificate Notice */}
+                    <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-gray-900 group">
+                        <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                            <h2 className="font-bold flex items-center gap-2">
+                                <Award className="w-5 h-5 text-purple-600" /> Certificates
+                            </h2>
+                        </div>
+                        <div className="p-6">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-6">
+                                Reward your participants with custom digital certificates.
+                            </p>
+
+                            {initialData?.id || initialData?._id ? (
+                                <a
+                                    href={`/events/${initialData.id || initialData._id}/certificate-template`}
+                                    className="w-full py-3 bg-purple-50 text-purple-600 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-purple-100 transition flex items-center justify-center gap-2 border border-purple-100"
+                                >
+                                    Open Designer <ChevronDown className="w-3 h-3 rotate-[-90deg]" />
+                                </a>
+                            ) : (
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-tight">
+                                    You can design certificates from the "Manage Event" dashboard after saving this event.
+                                </div>
+                            )}
                         </div>
                     </section>
 

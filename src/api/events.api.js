@@ -148,3 +148,53 @@ export const downloadRegistrationsExcel = async ({ collegeId, clubId, eventId })
     });
     return res.data;
 };
+
+// Certificate Template Endpoints
+export const getCertificateTemplate = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.get(`${basePath}/${eventId}/template`);
+    return res.data.data || res.data;
+};
+
+export const createCertificateTemplate = async ({ collegeId, clubId, eventId, formData }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.post(`${basePath}/${eventId}/template`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return res.data.data || res.data;
+};
+
+export const updateCertificateTemplate = async ({ collegeId, clubId, eventId, formData }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.patch(`${basePath}/${eventId}/template`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return res.data.data || res.data;
+};
+
+export const deleteCertificateTemplate = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.delete(`${basePath}/${eventId}/template`);
+    return res.data;
+};
+
+// Certificate Generation & Download
+export const generateCertificate = async ({ collegeId, clubId, eventId, registrationId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.post(`${basePath}/${eventId}/registrations/${registrationId}/certificates`);
+    return res.data.data || res.data;
+};
+
+export const generateBulkCertificates = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.post(`${basePath}/${eventId}/certificates`);
+    return res.data.data || res.data;
+};
+
+export const getCertificateDownloadUrl = (certificateId) => {
+    return `${axios.defaults.baseURL}/certificates/${certificateId}/download`;
+};

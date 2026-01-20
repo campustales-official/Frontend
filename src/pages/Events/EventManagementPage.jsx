@@ -8,11 +8,11 @@ import {
     CheckCircle2, XCircle, Trash2, Edit3, Loader2,
     ArrowLeft, ExternalLink, Zap, ShieldAlert, AlertTriangle, Send,
     Search, Filter, ChevronLeft, ChevronRight, MoreVertical, CheckCircle,
-    Eye, FileSpreadsheet
+    Eye, FileSpreadsheet, Award
 } from "lucide-react";
 import {
     getEventDetails, publishEvent, closeRegistration, completeEvent,
-    deleteEvent, getEventRegistrations, downloadRegistrationsExcel
+    deleteEvent, getEventRegistrations, downloadRegistrationsExcel, generateBulkCertificates, generateCertificate
 } from "../../api/events.api";
 
 export default function EventManagementPage() {
@@ -60,6 +60,8 @@ export default function EventManagementPage() {
                 case "close": return closeRegistration(params);
                 case "complete": return completeEvent(params);
                 case "delete": return deleteEvent(params);
+                case "generate_certs": return generateBulkCertificates(params);
+                case "generate_single_cert": return generateCertificate(params);
                 default: throw new Error("Invalid action");
             }
         },
@@ -267,10 +269,10 @@ export default function EventManagementPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-gray-50/50 border-y border-gray-100">
-                                        <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest min-w-[200px]">Participant Name</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Email Address</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
-                                        <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                                        <th className="px-8 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Participant</th>
+                                        <th className="px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-widest">Email</th>
+                                        <th className="px-6 py-5 text-center text-[11px] font-black text-gray-400 uppercase tracking-widest">Status</th>
+                                        <th className="px-8 py-5 text-right text-[11px] font-black text-gray-400 uppercase tracking-widest">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50 text-sm">
@@ -315,7 +317,26 @@ export default function EventManagementPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-8 py-4 text-right">
-                                                    <div className="flex justify-end gap-2">
+                                                    <div className="flex justify-end items-center gap-3">
+                                                        {reg.certificateId ? (
+                                                            <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-2 py-1 rounded-md border border-green-100" title="Certificate Issued">
+                                                                <Award className="w-3 h-3" />
+                                                                <span className="text-[8px] uppercase font-black tracking-widest">Issued</span>
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleAction({
+                                                                    action: "generate_single_cert",
+                                                                    params: { ...commonParams, registrationId: reg.registrationId }
+                                                                })}
+                                                                disabled={actionInProgress}
+                                                                className="flex items-center gap-1.5 px-2 py-1 bg-gray-900 text-white rounded-md text-[8px] font-black uppercase tracking-widest hover:bg-gray-800 transition disabled:opacity-50"
+                                                                title="Issue Certificate"
+                                                            >
+                                                                <Zap className="w-3 h-3 text-yellow-400" />
+                                                                Issue
+                                                            </button>
+                                                        )}
                                                         <button
                                                             onClick={() => navigate(`/events/${eventId}/registrations/${reg.registrationId}`, {
                                                                 state: {
@@ -406,6 +427,14 @@ export default function EventManagementPage() {
                                 />
                             )}
 
+                            {event.status === 'completed' && (
+                                <ActionButton
+                                    icon={Award} label="Generate All Certificates" subtext="BULK ISSUE TO PARTICIPANTS"
+                                    onClick={() => handleAction({ action: "generate_certs", params: commonParams })}
+                                    variant="blue" loading={actionInProgress}
+                                />
+                            )}
+
                             <div className="pt-4 mt-4 border-t border-gray-100">
                                 <button
                                     onClick={() => {
@@ -420,6 +449,26 @@ export default function EventManagementPage() {
                                 <p className="text-[10px] text-center text-gray-400 mt-3 font-bold uppercase tracking-widest">Danger Zone</p>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Certificate Management Card */}
+                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden relative group">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <Award className="w-20 h-20 -mr-6 -mt-6" />
+                        </div>
+                        <h3 className="text-sm font-black text-gray-900 mb-4 uppercase tracking-widest flex items-center gap-2">
+                            Recognition
+                        </h3>
+                        <p className="text-xs font-bold text-gray-400 leading-relaxed mb-6">
+                            Create and manage digital certificates that participants can download after completion.
+                        </p>
+                        <button
+                            onClick={() => navigate(`/events/${eventId}/certificate-template`)}
+                            className="w-full py-3 bg-gray-50 text-gray-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition border border-gray-200 shadow-sm flex items-center justify-center gap-2"
+                        >
+                            <Award className="w-4 h-4 text-blue-600" />
+                            Certificate Designer
+                        </button>
                     </div>
 
                     {/* Quick Summary Sidebar Card */}
