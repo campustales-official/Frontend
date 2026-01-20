@@ -1,16 +1,15 @@
 import { useNavigate, useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useMe } from "../../hooks/useMe";
 import {
-    getEventDetails, publishEvent, closeRegistration,
-    completeEvent, deleteEvent
-} from "../../api/events.api";
-import {
     Calendar, MapPin, Users, BarChart3, Clock,
     CheckCircle2, XCircle, Trash2, Edit3, Loader2,
-    ArrowLeft, ExternalLink, Zap, ShieldAlert, AlertTriangle, Send
+    ArrowLeft, ExternalLink, Zap, ShieldAlert, AlertTriangle, Send,
+    Search, Filter, ChevronLeft, ChevronRight, MoreVertical, CheckCircle
 } from "lucide-react";
+import { getEventDetails, publishEvent, closeRegistration, completeEvent, deleteEvent, getEventRegistrations } from "../../api/events.api";
 
 export default function EventManagementPage() {
     const navigate = useNavigate();
@@ -19,11 +18,34 @@ export default function EventManagementPage() {
     const { data: me } = useMe();
     const collegeId = me?.college?.id;
 
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const limit = 10;
+
     const { data: event, isLoading, isError } = useQuery({
         queryKey: ["event", eventId],
         queryFn: () => getEventDetails(eventId),
         enabled: !!eventId
     });
+
+    const clubId = event?.club?._id || event?.club?.id || null;
+
+    const { data: regData, isLoading: regsLoading } = useQuery({
+        queryKey: ["event-registrations", eventId, clubId, page, search, statusFilter],
+        queryFn: () => getEventRegistrations({
+            collegeId,
+            clubId,
+            eventId,
+            page,
+            limit,
+            search,
+            status: statusFilter
+        }),
+        enabled: !!eventId && !!collegeId && !!event
+    });
+
+    console.log("REGISTRATIONS DATA:", regData); // Debug log
 
     const invalidate = () => queryClient.invalidateQueries({ queryKey: ["event", eventId] });
 
@@ -54,7 +76,6 @@ export default function EventManagementPage() {
     if (isError) return <div className="p-10 text-center font-bold text-red-500">Event not found or access denied.</div>;
 
     // Extract clubId - handle different backend response structures
-    const clubId = event?.club?._id || event?.club?.id || null;
     console.log("EVENT MANAGEMENT - clubId:", clubId, "collegeId:", collegeId); // Debug
     const commonParams = { collegeId, clubId, eventId };
 
@@ -161,44 +182,162 @@ export default function EventManagementPage() {
                         </div>
                     </div>
 
-                    {/* Registration Status */}
-                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-xl font-black text-gray-900">Registration Status</h3>
-                            <div className="flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full animate-pulse">
-                                <span className="w-2 h-2 rounded-full bg-blue-600"></span> Live Updates
-                            </div>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="flex items-end justify-between">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-5xl font-black tracking-tighter text-gray-900">{event.registrationCount || 0}</span>
-                                    <span className="text-gray-400 font-bold text-xl">/ {event.capacity || "∞"} Participants</span>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-2xl font-black text-green-600">{event.capacity ? Math.round((event.registrationCount / event.capacity) * 100) : 0}%</p>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Capacity</p>
-                                </div>
-                            </div>
-
-                            <div className="h-4 w-full bg-gray-100 rounded-full overflow-hidden flex">
-                                <div className="h-full bg-blue-600 rounded-full" style={{ width: `${Math.min(100, (event.registrationCount / (event.capacity || 100)) * 100)}%` }}></div>
-                            </div>
-
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                                {[
-                                    { label: "Waitlist", value: event.waitlistCount || 0, icon: Clock, bg: "bg-amber-50", text: "text-amber-600" }
-                                ].map(stat => (
-                                    <div key={stat.label} className="p-4 rounded-2xl border border-gray-50 bg-gray-50/30">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xl font-black text-gray-900">{stat.value}</span>
-                                        </div>
+                    {/* Registrations List */}
+                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="p-8 pb-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                                <h3 className="text-xl font-black text-gray-900">Registrations</h3>
+                                <div className="flex items-center gap-3">
+                                    {/* Search */}
+                                    <div className="relative group flex-1 md:w-64">
+                                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search name or email..."
+                                            value={search}
+                                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                        />
                                     </div>
-                                ))}
+                                    {/* Status Filter */}
+                                    <div className="relative">
+                                        <select
+                                            value={statusFilter}
+                                            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                                            className="appearance-none pl-4 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+                                        >
+                                            <option value="">Status: All</option>
+                                            <option value="registered">Registered</option>
+                                            <option value="confirmed">Confirmed</option>
+                                            <option value="waitlisted">Waitlisted</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
+                                        <Filter className="w-3.5 h-3.5 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50/50 border-y border-gray-100">
+                                        <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest min-w-[200px]">Participant Name</th>
+                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Email Address</th>
+                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Checked-in</th>
+                                        <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50 text-sm">
+                                    {regsLoading ? (
+                                        <tr>
+                                            <td colSpan="5" className="px-8 py-12 text-center">
+                                                <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto" />
+                                                <p className="text-xs font-bold text-gray-400 mt-2 uppercase tracking-widest">Fetching Registrations...</p>
+                                            </td>
+                                        </tr>
+                                    ) : !regData?.registrations?.length ? (
+                                        <tr>
+                                            <td colSpan="5" className="px-8 py-12 text-center">
+                                                <div className="text-gray-300 mb-2 font-black text-3xl opacity-20 uppercase tracking-tighter italic">No Data</div>
+                                                <p className="text-sm font-bold text-gray-400">No registrations found for this event.</p>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        regData.registrations.map(reg => (
+                                            <tr key={reg.registrationId} className="hover:bg-gray-50/50 transition-colors group">
+                                                <td className="px-8 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xs shrink-0 ring-2 ring-white">
+                                                            {reg.user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="font-bold text-gray-900 truncate">{reg.user.name}</p>
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase text-xs">Student</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="font-medium text-gray-600 break-all">{reg.user.email}</span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${reg.status === 'registered' ? 'bg-blue-50 text-blue-600' :
+                                                        reg.status === 'confirmed' ? 'bg-green-50 text-green-600' :
+                                                            reg.status === 'waitlisted' ? 'bg-amber-50 text-amber-600' :
+                                                                'bg-gray-100 text-gray-600'
+                                                        }`}>
+                                                        {reg.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    {reg.attended ? (
+                                                        <div className="inline-flex p-1 bg-green-100 text-green-600 rounded-full">
+                                                            <CheckCircle className="w-4 h-4" />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="inline-flex p-1 bg-gray-100 text-gray-300 rounded-full">
+                                                            <CheckCircle className="w-4 h-4" />
+                                                        </div>
+                                                    )}
+                                                </td>
+                                                <td className="px-8 py-4 text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            onClick={() => navigate(`/events/${eventId}/registrations/${reg.registrationId}`, {
+                                                                state: {
+                                                                    registrationIds: regData?.registrations?.map(r => r.registrationId) || [],
+                                                                    clubId
+                                                                }
+                                                            })}
+                                                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-blue-600"
+                                                            title="View Full Details"
+                                                        >
+                                                            <ExternalLink className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Pagination */}
+                        {regData?.total > limit && (
+                            <div className="px-8 py-4 bg-gray-50/30 border-t border-gray-100 flex items-center justify-between">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                    Showing <span className="text-gray-900">{(page - 1) * limit + 1}</span> to <span className="text-gray-900">{Math.min(page * limit, regData.total)}</span> of <span className="text-gray-900">{regData.total}</span> entries
+                                </p>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        disabled={page === 1}
+                                        onClick={() => setPage(p => p - 1)}
+                                        className="p-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" />
+                                    </button>
+                                    {[...Array(Math.ceil(regData.total / limit))].map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setPage(i + 1)}
+                                            className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${page === i + 1 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-400 hover:bg-gray-50 border border-transparent'
+                                                }`}
+                                        >
+                                            {i + 1}
+                                        </button>
+                                    ))}
+                                    <button
+                                        disabled={page >= Math.ceil(regData.total / limit)}
+                                        onClick={() => setPage(p => p + 1)}
+                                        className="p-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -62,3 +62,45 @@ export const deleteEvent = async ({ collegeId, clubId, eventId }) => {
     const res = await axios.delete(`${basePath}/${eventId}`);
     return res.data;
 };
+
+export const registerForEvent = async ({ collegeId, clubId, eventId, answers, visibility }) => {
+    let url;
+    if (collegeId && (visibility === 'college' || visibility === 'club')) {
+        url = `/colleges/${collegeId}/events/${eventId}/register`;
+    } else {
+        url = `/events/${eventId}/register`;
+    }
+
+    const formData = new FormData();
+    if (clubId) {
+        formData.append("clubId", clubId);
+    }
+
+    if (answers && answers.length > 0) {
+        answers.forEach((ans, index) => {
+            formData.append(`answers[${index}][questionKey]`, ans.questionKey);
+            // If it's a file, it will be appended as a file object
+            formData.append(`answers[${index}][answer]`, ans.answer);
+        });
+    }
+
+    const res = await axios.post(url, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return res.data;
+};
+export const getEventRegistrations = async ({ collegeId, clubId, eventId, page = 1, limit = 10, search = "", status = "" }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.get(`${basePath}/${eventId}/registrations`, {
+        params: { page, limit, search, status }
+    });
+    return res.data.data || res.data;
+};
+
+export const getRegistrationDetails = async ({ collegeId, clubId, eventId, registrationId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.get(`${basePath}/${eventId}/registrations/${registrationId}`);
+    return res.data.data || res.data;
+};

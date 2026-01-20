@@ -85,6 +85,8 @@ export default function ClubDetailsPage() {
     // Determine enabled state for feed
     const isFeedEnabled = !!clubId && !!collegeId;
 
+    const [eventFilter, setEventFilter] = useState("all");
+
     const {
         data: feedData,
         fetchNextPage,
@@ -98,7 +100,7 @@ export default function ClubDetailsPage() {
         collegeId: collegeId,
         types: feedTypes,
         enabled: isFeedEnabled,
-        eventStatus: "published"
+        eventStatus: (isAdmin && activeTab === "events") ? eventFilter : "published"
     });
 
 
@@ -398,6 +400,27 @@ export default function ClubDetailsPage() {
                         </>
                     )}
 
+
+                    {/* Admin Event Filter */}
+                    {isAdmin && activeTab === 'events' && (
+                        <div className="flex items-center justify-end mb-4">
+                            <div className="bg-white border border-gray-200 p-1 rounded-lg flex items-center gap-1 shadow-sm overflow-x-auto max-w-full">
+                                {["all", "published", "draft", "completed", "cancelled"].map((status) => (
+                                    <button
+                                        key={status}
+                                        onClick={() => setEventFilter(status)}
+                                        className={`px-3 py-1.5 rounded-md text-xs font-bold capitalize transition-all whitespace-nowrap ${eventFilter === status
+                                            ? "bg-gray-900 text-white shadow-sm"
+                                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                                            }`}
+                                    >
+                                        {status}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Feed/List Content */}
                     <div className="flex flex-col gap-6">
                         {feedStatus === "pending" && <FeedSkeleton />}
@@ -418,7 +441,8 @@ export default function ClubDetailsPage() {
                                     const itemWithActions = {
                                         ...item,
                                         actions: itemActions,
-                                        showManageButton: isAdmin && item.type === 'event'
+                                        showManageButton: isAdmin && item.type === 'event',
+                                        showExploreButton: !isAdmin || (item.data.status === 'published')
                                     };
 
                                     return <FeedItem key={item.id} item={itemWithActions} />;

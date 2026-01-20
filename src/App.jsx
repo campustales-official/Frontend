@@ -23,6 +23,9 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import CreateEventPage from "./pages/Events/CreateEventPage";
 import UpdateEventPage from "./pages/Events/UpdateEventPage";
 import EventManagementPage from "./pages/Events/EventManagementPage";
+import EventDetailsPage from "./pages/Events/EventDetailsPage";
+import EventRegistrationPage from "./pages/Events/EventRegistrationPage";
+import RegistrationDetailPage from "./pages/Events/RegistrationDetailPage";
 
 function GuardedRoutes() {
   const location = useLocation();
@@ -90,11 +93,15 @@ function GuardedRoutes() {
         <Route path="club/:clubId/edit" element={<EditClubPage />} />
         <Route path="profile" element={<ProfilePage />} />
 
+        <Route path="events/:eventId" element={<EventDetailsPage />} />
+        <Route path="events/:eventId/register" element={<EventRegistrationPage />} />
+
         {/* Event Management */}
         <Route path="events/create" element={<CreateEventPage />} />
         <Route path="club/:clubId/events/create" element={<CreateEventPage />} />
         <Route path="events/:eventId/edit" element={<UpdateEventPage />} />
         <Route path="events/:eventId/manage" element={<EventManagementPage />} />
+        <Route path="events/:eventId/registrations/:registrationId" element={<RegistrationDetailPage />} />
       </Route>
     </Routes>
   );
