@@ -81,3 +81,8 @@ export const removeClubMember = async ({ collegeId, clubId, userId }) => {
     const res = await axios.delete(`/colleges/${collegeId}/clubs/${clubId}/members/${userId}`);
     return res.data;
 };
+
+export const registerClub = async ({ collegeId, data }) => {
+    const res = await axios.post(`/colleges/${collegeId}/clubs`, data);
+    return res.data.data;
+};

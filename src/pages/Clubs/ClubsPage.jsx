@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchClubs } from "../../api/clubs.api";
 import ClubSkeleton from "../../components/clubs/ClubSkeleton";
@@ -41,7 +43,16 @@ export default function ClubsPage({ collegeId }) {
     return (
         <div className="min-h-screen bg-gray-200 p-6">
             <div className="mx-auto w-full max-w-7xl">
-                <h1 className="text-2xl font-bold text-gray-900 mb-6 px-1">Explore Clubs</h1>
+                <div className="flex items-center justify-between mb-6 px-1">
+                    <h1 className="text-2xl font-bold text-gray-900">Explore Clubs</h1>
+                    <Link
+                        to="/clubs/register"
+                        className="flex items-center gap-2 bg-white text-blue-600 px-4 py-2 rounded-xl font-bold text-sm shadow-sm border border-blue-100 hover:bg-blue-50 transition"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Create Club
+                    </Link>
+                </div>
 
                 {(!clubs || clubs.length === 0) ? (
                     <div className="text-center py-10 text-gray-500">

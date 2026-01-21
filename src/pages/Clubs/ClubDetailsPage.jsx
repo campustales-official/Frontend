@@ -18,7 +18,7 @@ import CreateAnnouncementModal from "../../components/clubs/CreateAnnouncementMo
 
 import { updateClubPost, deleteClubPost, deleteClubAnnouncement, joinClub, leaveClub } from "../../api/clubs.api";
 import EditPostModal from "../../components/clubs/EditPostModal";
-import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Linkedin, Plus, Clock, User, UserPlus, CheckCircle, Loader2, Pencil, LogOut } from "lucide-react";
+import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Facebook, Linkedin, Plus, Clock, User, UserPlus, CheckCircle, Loader2, Pencil, LogOut } from "lucide-react";
 
 export default function ClubDetailsPage() {
     const { clubId } = useParams();
@@ -242,7 +242,7 @@ export default function ClubDetailsPage() {
                                 <button
                                     onClick={() => !joinPending && handleJoin()}
                                     disabled={joinPending}
-                                    className="w-36 md:w-40 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition shadow-sm disabled:opacity-70 disabled:cursor-not-allowed shrink-0"
+                                    className="w-36 md:w-40 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed shrink-0"
                                 >
                                     {joinPending ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -296,23 +296,33 @@ export default function ClubDetailsPage() {
                             {/* Social Links */}
                             <div className="flex items-center gap-4">
                                 {club.socialLinks?.website && (
-                                    <a href={club.socialLinks.website} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-blue-600 transition">
+                                    <a href={club.socialLinks.website} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-blue-600 transition" title="Website">
                                         <Globe className="w-5 h-5" />
                                     </a>
                                 )}
                                 {club.socialLinks?.instagram && (
-                                    <a href={club.socialLinks.instagram} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-pink-600 transition">
+                                    <a href={club.socialLinks.instagram} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-pink-600 transition" title="Instagram">
                                         <Instagram className="w-5 h-5" />
                                     </a>
                                 )}
                                 {club.socialLinks?.twitter && (
-                                    <a href={club.socialLinks.twitter} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-sky-500 transition">
+                                    <a href={club.socialLinks.twitter} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-sky-500 transition" title="X">
                                         <Twitter className="w-5 h-5" />
                                     </a>
                                 )}
                                 {club.socialLinks?.linkedin && (
-                                    <a href={club.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-blue-700 transition">
+                                    <a href={club.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-blue-700 transition" title="LinkedIn">
                                         <Linkedin className="w-5 h-5" />
+                                    </a>
+                                )}
+                                {club.socialLinks?.facebook && (
+                                    <a href={club.socialLinks.facebook} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-blue-600 transition" title="Facebook">
+                                        <Facebook className="w-5 h-5" />
+                                    </a>
+                                )}
+                                {club.socialLinks?.email && (
+                                    <a href={`mailto:${club.socialLinks.email}`} className="text-gray-400 hover:scale-110 text-orange-500 transition" title="Email">
+                                        <Mail className="w-5 h-5" />
                                     </a>
                                 )}
                             </div>

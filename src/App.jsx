@@ -16,6 +16,7 @@ import ClubsPage from "./pages/Clubs/ClubsPage";
 import ClubDetailsPage from "./pages/Clubs/ClubDetailsPage";
 import ClubMembersPage from "./pages/Clubs/ClubMembersPage";
 import EditClubPage from "./pages/Clubs/EditClubPage";
+import RegisterClubPage from "./pages/Clubs/RegisterClubPage";
 import ProfilePage from "./pages/Auth/ProfilePage";
 import DashboardLayout from "./layouts/DashboardLayout";
 
@@ -92,6 +93,7 @@ function GuardedRoutes() {
         <Route index element={<FeedPage scope="global" collegeId={me.college.id} />} />
         <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college.id} />} />
         <Route path="clubs" element={<ClubsPage collegeId={me.college.id} />} />
+        <Route path="clubs/register" element={<RegisterClubPage />} />
         <Route path="club/:clubId" element={<ClubDetailsPage />} />
         <Route path="club/:clubId/members" element={<ClubMembersPage />} />
         <Route path="club/:clubId/edit" element={<EditClubPage />} />

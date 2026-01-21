@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchClubs, updateClubDetails } from "../../api/clubs.api";
 import { useMe } from "../../hooks/useMe";
-import { ArrowLeft, Save, Upload, X, Plus, Instagram, Linkedin, Globe, Twitter, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Upload, X, Plus, Instagram, Linkedin, Globe, Twitter, Facebook, Mail, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function EditClubPage() {
@@ -32,7 +32,9 @@ export default function EditClubPage() {
             instagram: "",
             linkedin: "",
             website: "",
-            twitter: ""
+            twitter: "",
+            facebook: "",
+            email: ""
         }
     });
 
@@ -57,7 +59,9 @@ export default function EditClubPage() {
                     instagram: club.socialLinks?.instagram || "",
                     linkedin: club.socialLinks?.linkedin || "",
                     website: club.socialLinks?.website || "",
-                    twitter: club.socialLinks?.twitter || ""
+                    twitter: club.socialLinks?.twitter || "",
+                    facebook: club.socialLinks?.facebook || "",
+                    email: club.socialLinks?.email || ""
                 }
             });
             if (club.logo) setLogoPreview(club.logo);
@@ -338,7 +342,23 @@ export default function EditClubPage() {
                             <input
                                 type="text" name="socialLinks.twitter" value={formData.socialLinks.twitter} onChange={handleChange}
                                 className="flex-1 bg-transparent py-3 outline-none text-sm"
-                                placeholder="Twitter Profile Link"
+                                placeholder="X (formerly Twitter)"
+                            />
+                        </div>
+                        <div className="flex items-center gap-4 bg-gray-50 px-4 py-1 rounded-xl border border-gray-100 focus-within:border-blue-500 transition">
+                            <Facebook className="w-5 h-5 text-blue-600" />
+                            <input
+                                type="text" name="socialLinks.facebook" value={formData.socialLinks.facebook} onChange={handleChange}
+                                className="flex-1 bg-transparent py-3 outline-none text-sm"
+                                placeholder="Facebook Profile Link"
+                            />
+                        </div>
+                        <div className="flex items-center gap-4 bg-gray-50 px-4 py-1 rounded-xl border border-gray-100 focus-within:border-blue-500 transition">
+                            <Mail className="w-5 h-5 text-orange-500" />
+                            <input
+                                type="email" name="socialLinks.email" value={formData.socialLinks.email} onChange={handleChange}
+                                className="flex-1 bg-transparent py-3 outline-none text-sm"
+                                placeholder="Club Official Email"
                             />
                         </div>
                         <div className="flex items-center gap-4 bg-gray-50 px-4 py-1 rounded-xl border border-gray-100 focus-within:border-blue-500 transition">
