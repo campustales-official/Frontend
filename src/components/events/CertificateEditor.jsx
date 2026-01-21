@@ -44,7 +44,7 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
         return [
             { text: "Certificate of Participation", x: 50, y: 25, fontSize: 1.2, fontWeight: "bold", color: "#000000", align: "center", width: 80 },
             { text: "This is to certify that", x: 50, y: 40, fontSize: 0.8, fontWeight: "normal", color: "#666666", align: "center", width: 60 },
-            { text: "{{name}}", x: 50, y: 55, fontSize: 1.5, fontWeight: "bold", color: "#111111", align: "center", width: 70 },
+            { text: "{{Student_full_name}}", x: 50, y: 55, fontSize: 1.5, fontWeight: "bold", color: "#111111", align: "center", width: 70 },
             { text: "has successfully participated in {{event}}", x: 50, y: 68, fontSize: 0.6, fontWeight: "normal", color: "#666666", align: "center", width: 70 },
             { text: "held on {{date}}", x: 50, y: 75, fontSize: 0.5, fontWeight: "normal", color: "#999999", align: "center", width: 40 }
         ];
@@ -175,6 +175,7 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
             // Legacy Fields (Required for Validation)
             x: block.x,
             y: block.y,
+            width: block.width || 30, // Save width for proper X positioning in backend
             fontSize: block.fontSize,
 
             fontWeight: block.fontWeight,
@@ -199,7 +200,7 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
     };
 
     const placeholders = [
-        { label: "Full Name", value: "{{name}}" },
+        { label: "Full Name", value: "{{Student_full_name}}" },
         { label: "Email Address", value: "{{email}}" },
         { label: "Student Id", value: "{{identifier}}" },
         { label: "Event Title", value: "{{event}}" },
@@ -426,13 +427,14 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
                                     <div
                                         key={i}
                                         onMouseDown={(e) => handleMouseDown(e, i)}
-                                        className={`absolute cursor-move select-none p-2 rounded hover:ring-2 hover:ring-blue-400 transition-shadow ${isSelected ? 'ring-2 ring-blue-600 ring-offset-2 z-50 bg-blue-50/10' : 'z-10'}`}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className={`absolute cursor-move select-none p-1 rounded hover:ring-2 hover:ring-blue-400 transition-shadow ${isSelected ? 'ring-2 ring-blue-600 ring-offset-2 z-50 bg-blue-50/10' : 'z-10'}`}
                                         style={{
                                             left: `${block.x}%`,
                                             top: `${block.y}%`,
                                             width: `${block.width}%`,
                                             transform: block.align === 'center' ? 'translateX(-50%)' : block.align === 'right' ? 'translateX(-100%)' : 'none',
-                                            fontSize: `calc(1cqw * ${block.fontSize * (orientation === 'landscape' ? 1.25 : 0.8)})` // Scale font relative to canvas width
+                                            fontSize: `calc(1cqw * ${block.fontSize * (orientation === 'landscape' ? 1.25 : 1.25)})` // Scale font relative to canvas width
                                         }}
                                     >
                                         <div style={{
