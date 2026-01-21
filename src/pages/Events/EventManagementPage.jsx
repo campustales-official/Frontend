@@ -49,8 +49,6 @@ export default function EventManagementPage() {
         enabled: !!eventId && !!collegeId && !!event
     });
 
-    console.log("REGISTRATIONS DATA:", regData); // Debug log
-
     const invalidate = () => queryClient.invalidateQueries({ queryKey: ["event", eventId] });
 
     const { mutate: handleAction, isPending: actionInProgress } = useMutation({

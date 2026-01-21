@@ -18,7 +18,6 @@ export const createEvent = async ({ collegeId, clubId, formData }) => {
             "Content-Type": "multipart/form-data",
         },
     });
-    console.log("CREATE EVENT RESPONSE:", res.data); // Debug log
     return res.data.data;
 };
 
@@ -46,7 +45,6 @@ export const publishEvent = async ({ collegeId, clubId, eventId }) => {
 
 export const closeRegistration = async ({ collegeId, clubId, eventId }) => {
     const basePath = getBasePath(collegeId, clubId);
-    console.log(basePath)
     const res = await axios.post(`${basePath}/${eventId}/close-registration`);
     return res.data;
 };

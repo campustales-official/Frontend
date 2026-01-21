@@ -11,8 +11,13 @@ const SYSTEM_FIELD_LABELS = {
     semester: "Semester",
     year: "Year",
     yearOfAdmission: "Year of Admission",
-    passingYear: "Passing Year"
+    passingYear: "Passing Year",
+    identifier: "Student Id"
 };
+
+const PDF_WIDTH = 841.89;
+const PDF_HEIGHT = 595.28;
+const A4_ASPECT_RATIO = PDF_WIDTH / PDF_HEIGHT; // 1.414275...
 
 export default function CertificateEditor({ event, initialData, onSave, isSaving }) {
     const [background, setBackground] = useState(initialData?.backgroundImageUrl || null);
@@ -21,30 +26,33 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
     const [tempImage, setTempImage] = useState(null);
     const [showCropper, setShowCropper] = useState(false);
 
-    // Virtual coordinate system: Width is always 800. Height depends on orientation.
-    // Landscape: 800 / 1.414 = 565
-    // Portrait: 800 / 0.707 = 1131
-    const getCanvasHeight = (orient) => orient === "landscape" ? 565 : 1131;
+    // Virtual coordinate system: Width is always 800. Height depends on orientation and A4 ratio.
+    const getCanvasHeight = (orient) => orient === "landscape" ? Math.round(800 / A4_ASPECT_RATIO) : Math.round(800 * A4_ASPECT_RATIO);
     const canvasHeight = getCanvasHeight(orientation);
 
     const [textBlocks, setTextBlocks] = useState(() => {
         if (initialData?.textBlocks) {
             return initialData.textBlocks.map(block => ({
                 ...block,
-                text: block.placeholderKey || block.text || ""
+                text: block.placeholderKey || block.text || "",
+                // Coordinates are already stored as percentages (0-100), use directly
+                x: block.x,
+                y: block.y,
+                width: block.width ?? 30
             }));
         }
         return [
-            { text: "Certificate of Participation", x: 400, y: 150, fontSize: 1.2, fontWeight: "bold", color: "#000000", align: "center" },
-            { text: "This is to certify that", x: 400, y: 250, fontSize: 0.8, fontWeight: "normal", color: "#666666", align: "center" },
-            { text: "{{name}}", x: 400, y: 320, fontSize: 1.5, fontWeight: "bold", color: "#111111", align: "center" },
-            { text: "has successfully participated in {{event}}", x: 400, y: 400, fontSize: 0.6, fontWeight: "normal", color: "#666666", align: "center" },
-            { text: "held on {{date}}", x: 400, y: 430, fontSize: 0.5, fontWeight: "normal", color: "#999999", align: "center" }
+            { text: "Certificate of Participation", x: 50, y: 25, fontSize: 1.2, fontWeight: "bold", color: "#000000", align: "center", width: 80 },
+            { text: "This is to certify that", x: 50, y: 40, fontSize: 0.8, fontWeight: "normal", color: "#666666", align: "center", width: 60 },
+            { text: "{{name}}", x: 50, y: 55, fontSize: 1.5, fontWeight: "bold", color: "#111111", align: "center", width: 70 },
+            { text: "has successfully participated in {{event}}", x: 50, y: 68, fontSize: 0.6, fontWeight: "normal", color: "#666666", align: "center", width: 70 },
+            { text: "held on {{date}}", x: 50, y: 75, fontSize: 0.5, fontWeight: "normal", color: "#999999", align: "center", width: 40 }
         ];
     });
     const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
     const canvasRef = useRef(null);
     const [draggingIndex, setDraggingIndex] = useState(null);
+    const [resizingIndex, setResizingIndex] = useState(null);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
     const handleBackgroundChange = (e) => {
@@ -64,12 +72,13 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
     const addTextBlock = () => {
         const newBlock = {
             text: "New Text Block",
-            x: 400,
-            y: Math.round(canvasHeight / 2),
+            x: 50,
+            y: 50,
             fontSize: 1,
             fontWeight: "normal",
             color: "#000000",
-            align: "center"
+            align: "center",
+            width: 30
         };
         setTextBlocks([...textBlocks, newBlock]);
         setSelectedBlockIndex(textBlocks.length);
@@ -95,11 +104,8 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
         const block = textBlocks[index];
         const rect = canvasRef.current.getBoundingClientRect();
 
-        // Calculate initial offset relative to the block's current x, y
-        // Note: Our x,y are "center" based if align is center, but for drag simplicity, 
-        // we scale everything to a 800px width canvas.
-        const mouseX = ((e.clientX - rect.left) / rect.width) * 800;
-        const mouseY = ((e.clientY - rect.top) / rect.height) * canvasHeight;
+        const mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+        const mouseY = ((e.clientY - rect.top) / rect.height) * 100;
 
         setDragOffset({
             x: mouseX - block.x,
@@ -107,21 +113,45 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
         });
     };
 
+    const handleResizeStart = (e, index) => {
+        e.stopPropagation();
+        setResizingIndex(index);
+    };
+
     const handleMouseMove = (e) => {
-        if (draggingIndex === null) return;
-
         const rect = canvasRef.current.getBoundingClientRect();
-        const mouseX = ((e.clientX - rect.left) / rect.width) * 800;
-        const mouseY = ((e.clientY - rect.top) / rect.height) * canvasHeight;
+        if (draggingIndex !== null) {
+            const mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+            const mouseY = ((e.clientY - rect.top) / rect.height) * 100;
 
-        updateBlock(draggingIndex, {
-            x: Math.round(mouseX - dragOffset.x),
-            y: Math.round(mouseY - dragOffset.y)
-        });
+            updateBlock(draggingIndex, {
+                x: Math.min(100, Math.max(0, mouseX - dragOffset.x)),
+                y: Math.min(100, Math.max(0, mouseY - dragOffset.y))
+            });
+        } else if (resizingIndex !== null) {
+            const block = textBlocks[resizingIndex];
+            const mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+
+            // Calculate new width relative to the anchor point
+            // For center alignment, width expands both ways, but simplified to track mouseX
+            let newWidth;
+            if (block.align === 'center') {
+                newWidth = Math.abs(mouseX - block.x) * 2;
+            } else if (block.align === 'right') {
+                newWidth = block.x - mouseX;
+            } else {
+                newWidth = mouseX - block.x;
+            }
+
+            updateBlock(resizingIndex, {
+                width: Math.min(100, Math.max(5, newWidth))
+            });
+        }
     };
 
     const handleMouseUp = () => {
         setDraggingIndex(null);
+        setResizingIndex(null);
     };
 
     const insertPlaceholder = (placeholder) => {
@@ -135,16 +165,29 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
     const handleFormSubmit = (e) => {
         e.preventDefault();
 
-        // Map textBlocks to match the expected backend schema (placeholderKey instead of text)
+        // Map textBlocks to match the expected backend schema (Normalized Coordinates)
         const mappedBlocks = textBlocks.map(block => ({
-            placeholderKey: block.text,
+            text: block.text,
+            // GOLDEN RULE: Normalized Coordinates
+            xPercent: block.x,
+            yPercent: block.y,
+            fontScale: block.fontSize,
+            // Legacy Fields (Required for Validation)
             x: block.x,
             y: block.y,
             fontSize: block.fontSize,
+
             fontWeight: block.fontWeight,
             color: block.color,
-            align: block.align
+            align: block.align,
+            // Keeping placeholderKey for backward compat if needed, but text is primary
+            placeholderKey: block.text
         }));
+
+        console.log("Certificate Editor Debug - Submit (Normalized):", {
+            textBlocks: mappedBlocks,
+            orientation
+        });
 
         const data = {
             name: event?.title || "Participation Certificate",
@@ -158,6 +201,7 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
     const placeholders = [
         { label: "Full Name", value: "{{name}}" },
         { label: "Email Address", value: "{{email}}" },
+        { label: "Student Id", value: "{{identifier}}" },
         { label: "Event Title", value: "{{event}}" },
         { label: "Event Start Date", value: "{{eventStartDate}}" },
         { label: "College Name", value: "{{collegeName}}" },
@@ -198,7 +242,10 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
 
                     <div>
                         <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">Background Template</label>
-                        <div className={`relative group overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 hover:border-blue-400 transition-all flex flex-col items-center justify-center bg-gray-50 ${orientation === 'landscape' ? 'aspect-[1.414/1]' : 'aspect-[1/1.414]'}`}>
+                        <div
+                            className={`relative group overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 hover:border-blue-400 transition-all flex flex-col items-center justify-center bg-gray-50`}
+                            style={{ aspectRatio: orientation === 'landscape' ? A4_ASPECT_RATIO : 1 / A4_ASPECT_RATIO }}
+                        >
                             {background ? (
                                 <>
                                     <img src={background} className="absolute inset-0 w-full h-full object-cover opacity-50" alt="bg" />
@@ -224,7 +271,7 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
                                     </button>
                                 </div>
                             )}
-                            <input id="bg-upload" type="file" className="hidden" accept="image/*" onChange={handleBackgroundChange} />
+                            <input id="bg-upload" type="file" className="hidden" accept="image/*" onChange={handleBackgroundChange} onClick={(e) => (e.target.value = null)} />
                         </div>
                     </div>
 
@@ -342,7 +389,12 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
                     </div>
 
                     <div
-                        className={`relative w-full bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden shadow-inner flex items-center justify-center group/canvas transition-all ${orientation === 'landscape' ? 'aspect-[1.414/1]' : 'aspect-[1/1.414] min-h-[600px]'}`}
+                        className={`relative w-full bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden shadow-inner flex items-center justify-center group/canvas transition-all ${orientation === 'portrait' ? 'min-h-[600px]' : ''}`}
+                        style={{
+                            aspectRatio: orientation === 'landscape' ? A4_ASPECT_RATIO : 1 / A4_ASPECT_RATIO,
+                            maxWidth: orientation === 'portrait' ? '500px' : 'none',
+                            margin: '0 auto'
+                        }}
                         onMouseMove={handleMouseMove}
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
@@ -368,18 +420,17 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
                             )}
 
                             {textBlocks.map((block, i) => {
-                                // Convert 800-width-based coordinates
-                                const left = (block.x / 800) * 100;
-                                const top = (block.y / canvasHeight) * 100;
+                                const isSelected = selectedBlockIndex === i;
 
                                 return (
                                     <div
                                         key={i}
                                         onMouseDown={(e) => handleMouseDown(e, i)}
-                                        className={`absolute cursor-move select-none p-2 rounded hover:ring-2 hover:ring-blue-400 transition-shadow ${selectedBlockIndex === i ? 'ring-2 ring-blue-600 ring-offset-2 z-50 bg-blue-50/10' : 'z-10'}`}
+                                        className={`absolute cursor-move select-none p-2 rounded hover:ring-2 hover:ring-blue-400 transition-shadow ${isSelected ? 'ring-2 ring-blue-600 ring-offset-2 z-50 bg-blue-50/10' : 'z-10'}`}
                                         style={{
-                                            left: `${left}%`,
-                                            top: `${top}%`,
+                                            left: `${block.x}%`,
+                                            top: `${block.y}%`,
+                                            width: `${block.width}%`,
                                             transform: block.align === 'center' ? 'translateX(-50%)' : block.align === 'right' ? 'translateX(-100%)' : 'none',
                                             fontSize: `calc(1cqw * ${block.fontSize * (orientation === 'landscape' ? 1.25 : 0.8)})` // Scale font relative to canvas width
                                         }}
@@ -390,9 +441,20 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
                                             color: block.color,
                                             textAlign: block.align,
                                             whiteSpace: 'pre-wrap',
+                                            wordBreak: 'break-word'
                                         }}>
                                             {block.text}
                                         </div>
+
+                                        {/* Resize Handle */}
+                                        {isSelected && (
+                                            <div
+                                                onMouseDown={(e) => handleResizeStart(e, i)}
+                                                className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-blue-600 border-2 border-white cursor-se-resize shadow-sm flex items-center justify-center transform translate-x-1/2 translate-y-1/2"
+                                            >
+                                                <div className="w-1.5 h-1.5 bg-white rounded-full opacity-50" />
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -502,7 +564,7 @@ function ImageCropper({ imageUrl, orientation, onCrop, onCancel }) {
     const containerRef = useRef(null);
     const imageRef = useRef(null);
 
-    const aspect = orientation === 'landscape' ? 1.414 : 1 / 1.414;
+    const aspect = orientation === 'landscape' ? A4_ASPECT_RATIO : 1 / A4_ASPECT_RATIO;
 
     const handleCrop = () => {
         const canvas = document.createElement('canvas');
@@ -540,6 +602,14 @@ function ImageCropper({ imageUrl, orientation, onCrop, onCancel }) {
         const sWidth = rect.width * scaleX;
         const sHeight = rect.height * scaleY;
 
+        console.log("Certificate Editor Debug - Crop:", {
+            visualX, visualY,
+            naturalWidth, naturalHeight,
+            scaleX, scaleY,
+            sx, sy, sWidth, sHeight,
+            rect, imgRect
+        });
+
         ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
 
         canvas.toBlob((blob) => {
@@ -554,9 +624,9 @@ function ImageCropper({ imageUrl, orientation, onCrop, onCancel }) {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-white rounded-[40px] shadow-2xl overflow-hidden max-w-4xl w-full flex flex-col max-h-[90vh]"
+                className="bg-white rounded-[40px] shadow-2xl overflow-hidden max-w-4xl w-full sm:w-[40vw] flex flex-col max-h-[90vh]"
             >
-                <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                     <div>
                         <h3 className="text-xl font-black text-gray-900 tracking-tight">Snapshot Preview</h3>
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Adjust position to fit {orientation} frame</p>
@@ -566,32 +636,29 @@ function ImageCropper({ imageUrl, orientation, onCrop, onCancel }) {
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-hidden p-10 bg-gray-100 flex items-center justify-center min-h-[400px]">
+                <div className="flex-1 overflow-auto p-6 md:p-10 bg-gray-100 flex">
                     <div
                         ref={containerRef}
-                        className="relative overflow-hidden bg-white shadow-2xl ring-1 ring-black/5"
+                        className="relative bg-white shadow-2xl ring-1 ring-black/5 m-auto overflow-hidden flex-shrink-0"
                         style={{
-                            width: orientation === 'landscape' ? 'min(700px, 80vw)' : 'min(350px, 40vw)',
                             aspectRatio: aspect,
+                            width: `min(100%, calc(70vh * ${aspect}))`,
+                            maxWidth: '100%',
+                            maxHeight: '100%'
                         }}
                     >
                         <motion.img
                             ref={imageRef}
                             src={imageUrl}
                             drag
-                            dragConstraints={containerRef}
+                            dragMomentum={false}
                             style={{
                                 scale: scale,
-                                x: position.x,
-                                y: position.y,
                                 cursor: 'move',
                                 maxWidth: 'none',
-                                // Initial fit: cover
-                                minWidth: '100%',
-                                minHeight: '100%',
-                                objectFit: 'contain'
+                                width: '100%',
+                                height: 'auto', // Keep natural ratio
                             }}
-                            onDragEnd={(e, info) => setPosition({ x: info.point.x, y: info.point.y })}
                             alt="crop-preview"
                         />
                         {/* Frame Overlay */}
@@ -610,12 +677,12 @@ function ImageCropper({ imageUrl, orientation, onCrop, onCancel }) {
                     </div>
                 </div>
 
-                <div className="p-8 bg-white border-t border-gray-100 space-y-6">
+                <div className="p-4 bg-white border-t border-gray-100 space-y-1">
                     <div className="flex items-center gap-6">
                         <div className="flex-1">
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Zoom Intensity</label>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Zoom Scale</label>
                             <input
-                                type="range" min="1" max="3" step="0.01"
+                                type="range" min="0.1" max="10" step="0.01"
                                 value={scale}
                                 onChange={(e) => setScale(parseFloat(e.target.value))}
                                 className="w-full accent-blue-600"
@@ -626,13 +693,13 @@ function ImageCropper({ imageUrl, orientation, onCrop, onCancel }) {
                     <div className="flex justify-end gap-3">
                         <button
                             onClick={onCancel}
-                            className="px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border border-gray-200 text-gray-400 hover:bg-gray-50 transition"
+                            className="px-8 py-2 rounded-2xl font-black text-xs uppercase tracking-widest border border-gray-200 text-gray-400 hover:bg-gray-50 transition"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleCrop}
-                            className="px-10 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition"
+                            className="px-10 py-2 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition"
                         >
                             Confirm Snapshot
                         </button>
