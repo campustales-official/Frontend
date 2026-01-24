@@ -21,6 +21,13 @@ import RegisterClubPage from "./pages/Clubs/RegisterClubPage";
 import ProfilePage from "./pages/Auth/ProfilePage";
 import DashboardLayout from "./layouts/DashboardLayout";
 
+// Admin
+import AdminPanel from "./pages/Admin/AdminPanel";
+import RegisterCollege from "./pages/Admin/RegisterCollege";
+import RegisterSuperadmin from "./pages/Admin/RegisterSuperadmin";
+import AnnouncementsManagement from "./pages/Admin/AnnouncementsManagement";
+import UserSearch from "./pages/Admin/UserSearch";
+
 // Events
 import EventsPage from "./pages/Events/EventsPage";
 import CreateEventPage from "./pages/Events/CreateEventPage";
@@ -62,6 +69,10 @@ function GuardedRoutes() {
   // ✅ Logged in - redirect away from public auth pages
   const publicAuthPaths = ["/login", "/signup", "/forgot-password"];
   if (publicAuthPaths.includes(path)) {
+    // If superadmin, redirect to admin panel, else to home
+    if (me.platformRole === 'superadmin') {
+      return <Navigate to="/admin" replace />;
+    }
     return <Navigate to="/" replace />;
   }
 
@@ -74,9 +85,21 @@ function GuardedRoutes() {
 
   // ✅ Logged in AND verified — leave verify page
   if (me.isEmailVerified && path === "/verify-email") {
+    if (me.platformRole === 'super_admin') {
+      return <Navigate to="/admin" replace />;
+    }
     return <Navigate to="/" replace />;
   }
 
+  // 👑 Superadmin Redirection from regular dashboard
+  if (me.platformRole === 'super_admin' && !path.startsWith('/admin')) {
+    return <Navigate to="/admin" replace />;
+  }
+
+  // 👤 Regular User Redirection from admin dashboard
+  if (me.platformRole !== 'super_admin' && path.startsWith('/admin')) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Routes>
@@ -89,12 +112,23 @@ function GuardedRoutes() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailOtpPage />} />
 
+      {/* Admin Routes */}
+      {me.platformRole === 'super_admin' && (
+        <Route path="/admin">
+          <Route index element={<AdminPanel />} />
+          <Route path="register-college" element={<RegisterCollege />} />
+          <Route path="register-superadmin" element={<RegisterSuperadmin />} />
+          <Route path="announcements" element={<AnnouncementsManagement />} />
+          <Route path="user-search" element={<UserSearch />} />
+        </Route>
+      )}
+
       {/* Dashboard Routes */}
       <Route path="/" element={<DashboardLayout />}>
-        <Route index element={<FeedPage scope="global" collegeId={me.college.id} />} />
-        <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college.id} />} />
+        <Route index element={<FeedPage scope="global" collegeId={me.college?.id} />} />
+        <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college?.id} />} />
         <Route path="college" element={<CollegeDashboard />} />
-        <Route path="clubs" element={<ClubsPage collegeId={me.college.id} />} />
+        <Route path="clubs" element={<ClubsPage collegeId={me.college?.id} />} />
         <Route path="clubs/register" element={<RegisterClubPage />} />
         <Route path="club/:clubId" element={<ClubDetailsPage />} />
         <Route path="club/:clubId/members" element={<ClubMembersPage />} />
