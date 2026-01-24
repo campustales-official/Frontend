@@ -4,8 +4,9 @@ import { Send, Loader2, Clock } from "lucide-react";
 import { toast } from "react-toastify";
 import Modal from "../common/Modal";
 import { createClubAnnouncement } from "../../api/clubs.api";
+import { createCollegeAnnouncement } from "../../api/colleges.api";
 
-export default function CreateAnnouncementModal({ isOpen, onClose, clubId, collegeId }) {
+export default function CreateAnnouncementModal({ isOpen, onClose, clubId, collegeId, isCollegeScope = false }) {
     const [title, setTitle] = useState("");
     const [message, setMessage] = useState("");
     const [expiresAt, setExpiresAt] = useState("");
@@ -13,7 +14,7 @@ export default function CreateAnnouncementModal({ isOpen, onClose, clubId, colle
     const queryClient = useQueryClient();
 
     const { mutate, isPending } = useMutation({
-        mutationFn: createClubAnnouncement,
+        mutationFn: isCollegeScope ? createCollegeAnnouncement : createClubAnnouncement,
         onSuccess: () => {
             toast.success("Announcement published!");
             queryClient.invalidateQueries({ queryKey: ["feed"] });

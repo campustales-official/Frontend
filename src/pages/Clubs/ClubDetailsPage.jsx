@@ -51,7 +51,8 @@ export default function ClubDetailsPage() {
 
     // Check permission
     const myRoleObj = me?.clubRoles?.find(r => r.clubId === clubId);
-    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "super_admin";
+    const isCollegeAdmin = me?.roleInCollege === "college_admin";
+    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "super_admin" || isCollegeAdmin;
     const isMember = !!myRoleObj; // If role obj exists, user is member/admin
 
     // Join Mutation

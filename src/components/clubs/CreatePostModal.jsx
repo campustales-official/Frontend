@@ -4,15 +4,18 @@ import { Image as ImageIcon, X, UploadCloud, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Modal from "../common/Modal";
 import { createClubPost } from "../../api/clubs.api";
+import { createCollegePost } from "../../api/colleges.api";
+import { Eye, Globe, Building2, Users as UsersIcon } from "lucide-react";
 
-export default function CreatePostModal({ isOpen, onClose, clubId, collegeId }) {
+export default function CreatePostModal({ isOpen, onClose, clubId, collegeId, isCollegeScope = false }) {
     const [content, setContent] = useState("");
+    const [visibility, setVisibility] = useState(isCollegeScope ? "college" : "club");
     const [files, setFiles] = useState([]);
     const fileInputRef = useRef(null);
     const queryClient = useQueryClient();
 
     const { mutate, isPending } = useMutation({
-        mutationFn: createClubPost,
+        mutationFn: isCollegeScope ? createCollegePost : createClubPost,
         onSuccess: () => {
             toast.success("Post created successfully!");
             queryClient.invalidateQueries({ queryKey: ["feed"] });
@@ -26,6 +29,7 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId }) 
     const handleClose = () => {
         setContent("");
         setFiles([]);
+        setVisibility(isCollegeScope ? "college" : "club");
         onClose();
     };
 
@@ -72,7 +76,7 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId }) 
             toast.warn("Please add some content or an image.");
             return;
         }
-        mutate({ collegeId, clubId, content, files });
+        mutate({ collegeId, clubId, content, files, visibility });
     };
 
     // Drag and Drop
@@ -95,7 +99,7 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId }) 
             <div className="space-y-4">
                 <textarea
                     rows="4"
-                    placeholder="What's happening in the club?"
+                    placeholder={isCollegeScope ? "What's happening in the college?" : "What's happening in the club?"}
                     className="w-full p-4 rounded-xl bg-gray-50 border-0 focus:ring-2 focus:ring-blue-100 resize-none transition"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
@@ -142,14 +146,39 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId }) 
                     </div>
                 )}
 
+                {/* Visibility Selector */}
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Visibility:</span>
+                    <div className="flex items-center gap-1">
+                        {[
+                            { id: 'global', label: 'Global', icon: Globe, color: 'text-blue-600', bg: 'bg-blue-50' },
+                            { id: 'college', label: 'College', icon: Building2, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                            ...(isCollegeScope ? [] : [{ id: 'club', label: 'Club', icon: UsersIcon, color: 'text-pink-600', bg: 'bg-pink-50' }])
+                        ].map((opt) => (
+                            <button
+                                key={opt.id}
+                                onClick={() => setVisibility(opt.id)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${visibility === opt.id
+                                    ? `${opt.bg} ${opt.color} ring-1 ring-inset ring-current shadow-sm`
+                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                title={`${opt.label} visibility`}
+                            >
+                                <opt.icon className="w-3.5 h-3.5" />
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="pt-2 flex justify-end">
                     <button
                         onClick={handleSubmit}
                         disabled={isPending}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-sm hover:shadow-md transition active:scale-95 disabled:opacity-70 flex items-center gap-2"
+                        className="bg-gray-900 hover:bg-black text-white font-bold py-2.5 px-8 rounded-xl shadow-lg shadow-gray-200 transition active:scale-95 disabled:opacity-70 flex items-center gap-2"
                     >
                         {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                        Post Update
+                        Publish Post
                     </button>
                 </div>
             </div>

@@ -27,7 +27,8 @@ export default function ClubMembersPage() {
 
     // Admin Check
     const myRoleObj = me?.clubRoles?.find(r => r.clubId === clubId);
-    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "super_admin";
+    const isCollegeAdmin = me?.roleInCollege === "college_admin";
+    const isAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "super_admin" || isCollegeAdmin;
 
     // Action State
     const [selectedMember, setSelectedMember] = useState(null);

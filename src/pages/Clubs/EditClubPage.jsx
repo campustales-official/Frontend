@@ -154,7 +154,22 @@ export default function EditClubPage() {
         updateClub(data);
     };
 
+    const isCollegeAdmin = me?.roleInCollege === "college_admin";
+    const myRoleObj = me?.clubRoles?.find(r => r.clubId === clubId);
+    const isClubAdmin = myRoleObj?.role === "admin" || myRoleObj?.role === "super_admin";
+    const isAdmin = isClubAdmin || isCollegeAdmin;
+
     if (isLoading) return <div className="p-10 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
+
+    if (!isAdmin) {
+        return (
+            <div className="p-20 text-center">
+                <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
+                <p className="text-gray-500 mt-2">You do not have permission to edit this club.</p>
+                <button onClick={() => navigate(-1)} className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg font-bold">Back</button>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">

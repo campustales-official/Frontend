@@ -73,6 +73,7 @@ export default function CreateEventPage() {
             <EventFormBase
                 id="create-event-form"
                 onSubmit={onSubmit}
+                initialData={{ visibility: searchParams.get("visibility") || "college" }}
             />
 
             {/* Sticky Actions Bar */}

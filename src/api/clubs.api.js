@@ -1,13 +1,16 @@
 import axios from "../lib/axios";
 
-export const fetchClubs = async ({ collegeId }) => {
-    const res = await axios.get(`/colleges/${collegeId}/clubs`);
+export const fetchClubs = async ({ collegeId, status }) => {
+    const res = await axios.get(`/colleges/${collegeId}/clubs`, {
+        params: { status }
+    });
     return res.data.data;
 };
 
-export const createClubPost = async ({ collegeId, clubId, content, files }) => {
+export const createClubPost = async ({ collegeId, clubId, content, files, visibility }) => {
     const formData = new FormData();
     formData.append("content", content);
+    formData.append("visibility", visibility || "club");
     if (files && files.length > 0) {
         // Defensive: Limit to 5 files max to prevent Multer "Unexpected Field/File" errors
         files.slice(0, 5).forEach((file) => {
@@ -85,4 +88,19 @@ export const removeClubMember = async ({ collegeId, clubId, userId }) => {
 export const registerClub = async ({ collegeId, data }) => {
     const res = await axios.post(`/colleges/${collegeId}/clubs`, data);
     return res.data.data;
+};
+
+export const approveClub = async ({ collegeId, clubId }) => {
+    const res = await axios.patch(`/colleges/${collegeId}/clubs/${clubId}/approve`);
+    return res.data.data;
+};
+
+export const rejectClub = async ({ collegeId, clubId }) => {
+    const res = await axios.delete(`/colleges/${collegeId}/clubs/${clubId}/reject`);
+    return res.data;
+};
+
+export const deactivateClub = async ({ collegeId, clubId }) => {
+    const res = await axios.patch(`/colleges/${collegeId}/clubs/${clubId}/deactivate`);
+    return res.data;
 };

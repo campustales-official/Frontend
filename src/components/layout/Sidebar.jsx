@@ -1,13 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutGrid, Calendar, Users, Megaphone, User } from "lucide-react";
+import { LayoutGrid, Calendar, Users, Megaphone, User, School } from "lucide-react";
 
 export default function Sidebar() {
     const location = useLocation();
 
     const links = [
         { name: "Feed", icon: LayoutGrid, path: "/" },
-        { name: "Events", icon: Calendar, path: "/events" },
+        { name: "College", icon: School, path: "/college" },
         { name: "Clubs", icon: Users, path: "/clubs" },
+        { name: "Events", icon: Calendar, path: "/events" },
         { name: "Announcements", icon: Megaphone, path: "/announcements" },
     ];
 

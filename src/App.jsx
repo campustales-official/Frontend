@@ -13,6 +13,7 @@ import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
 import FeedPage from "./pages/Feed/FeedPage";
 import AnnouncementsPage from "./pages/Feed/AnnouncementsPage";
 import ClubsPage from "./pages/Clubs/ClubsPage";
+import CollegeDashboard from "./pages/College/CollegeDashboard";
 import ClubDetailsPage from "./pages/Clubs/ClubDetailsPage";
 import ClubMembersPage from "./pages/Clubs/ClubMembersPage";
 import EditClubPage from "./pages/Clubs/EditClubPage";
@@ -92,6 +93,7 @@ function GuardedRoutes() {
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<FeedPage scope="global" collegeId={me.college.id} />} />
         <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college.id} />} />
+        <Route path="college" element={<CollegeDashboard />} />
         <Route path="clubs" element={<ClubsPage collegeId={me.college.id} />} />
         <Route path="clubs/register" element={<RegisterClubPage />} />
         <Route path="club/:clubId" element={<ClubDetailsPage />} />
