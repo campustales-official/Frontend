@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const SYSTEM_FIELD_LABELS = {
     branch: "Branch",
     degree: "Degree",
-    semester: "Semester",
+    // semester: "Semester",
     year: "Year",
     yearOfAdmission: "Year of Admission",
     passingYear: "Passing Year",
@@ -204,8 +204,8 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
         { label: "Email Address", value: "{{email}}" },
         { label: "Student Id", value: "{{identifier}}" },
         { label: "Event Title", value: "{{event}}" },
-        { label: "Event Start Date", value: "{{eventStartDate}}" },
-        { label: "College Name", value: "{{collegeName}}" },
+        { label: "Event Date", value: "{{eventDate}}" },
+        { label: "Student's College Name", value: "{{Students_college}}" },
         ...(event?.club ? [{ label: "Club Name", value: "{{clubName}}" }] : []),
         ...(Array.isArray(event?.requiredUserFields)
             ? event.requiredUserFields

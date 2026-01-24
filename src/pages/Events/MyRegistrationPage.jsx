@@ -37,6 +37,8 @@ export default function MyRegistrationPage() {
         enabled: !!eventId
     });
 
+    const isRegistrationClosed = event?.registrationEndAt ? new Date(event.registrationEndAt) < new Date() : false;
+
     const { mutate: handleCancel, isPending: cancelPending } = useMutation({
         mutationFn: () => cancelRegistration(registrationId),
         onSuccess: () => {
@@ -84,12 +86,14 @@ export default function MyRegistrationPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => navigate(`/events/${eventId}/register`, { state: { editRegistration: reg } })}
-                            className="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-gray-800 transition shadow-lg active:scale-95"
-                        >
-                            <Pencil className="w-3.5 h-3.5" /> Edit Details
-                        </button>
+                        {!isRegistrationClosed && (
+                            <button
+                                onClick={() => navigate(`/events/${eventId}/register`, { state: { editRegistration: reg } })}
+                                className="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-gray-800 transition shadow-lg active:scale-95"
+                            >
+                                <Pencil className="w-3.5 h-3.5" /> Edit Details
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -115,10 +119,10 @@ export default function MyRegistrationPage() {
                     <div className="space-y-6">
                         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-center">
                             <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-3xl mx-auto mb-4 ring-4 ring-white shadow-xl shadow-blue-500/10">
-                                {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : "U"}
                             </div>
-                            <h2 className="text-2xl font-black text-gray-900 leading-tight">{user.name}</h2>
-                            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mt-1">{user.degree} {user.branch}</p>
+                            <h2 className="text-2xl font-black text-gray-900 leading-tight">{user?.name || "Anonymous"}</h2>
+                            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mt-1">{user?.degree || ""} {user?.branch || ""}</p>
 
                             <div className="mt-8 pt-8 border-t border-gray-50 space-y-4">
                                 <div className="flex items-center gap-3 text-left">
@@ -127,7 +131,7 @@ export default function MyRegistrationPage() {
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Registered Email</p>
-                                        <p className="text-sm font-bold text-gray-900 truncate">{user.email}</p>
+                                        <p className="text-sm font-bold text-gray-900 truncate">{user?.email || "No email"}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 text-left">
@@ -143,26 +147,73 @@ export default function MyRegistrationPage() {
                         </div>
 
                         {/* Danger Zone */}
-                        <div className="bg-red-50 rounded-3xl border border-red-100 p-6">
-                            <h3 className="text-xs font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <AlertTriangle className="w-3.5 h-3.5" /> Danger Zone
-                            </h3>
-                            <p className="text-[11px] text-red-500 font-bold leading-relaxed mb-4">
-                                If you can no longer attend this event, please cancel your registration to open up space for others.
-                            </p>
-                            <button
-                                onClick={onCancelClick}
-                                disabled={cancelPending}
-                                className="w-full bg-white border border-red-200 text-red-600 font-bold py-2.5 rounded-xl text-xs hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
-                            >
-                                {cancelPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                                Cancel Registration
-                            </button>
-                        </div>
+                        {!isRegistrationClosed && (
+                            <div className="bg-red-50 rounded-3xl border border-red-100 p-6">
+                                <h3 className="text-xs font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <AlertTriangle className="w-3.5 h-3.5" /> Danger Zone
+                                </h3>
+                                <p className="text-[11px] text-red-500 font-bold leading-relaxed mb-4">
+                                    If you can no longer attend this event, please cancel your registration to open up space for others.
+                                </p>
+                                <button
+                                    onClick={onCancelClick}
+                                    disabled={cancelPending}
+                                    className="w-full bg-white border border-red-200 text-red-600 font-bold py-2.5 rounded-xl text-xs hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                                >
+                                    {cancelPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                                    Cancel Registration
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Main Info - Tubular Layout */}
                     <div className="md:col-span-2 space-y-8">
+                        {/* Submitted Details Section */}
+                        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div className="px-8 py-6 border-b border-gray-50">
+                                <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                                    <User className="w-4 h-4 text-blue-600" /> Submitted Details
+                                </h3>
+                            </div>
+                            <div className="p-8">
+                                <div className="grid grid-cols-2 gap-6">
+                                    {(() => {
+                                        const fieldLabels = {
+                                            name: "Full Name",
+                                            email: "Email",
+                                            identifier: "Student ID",
+                                            branch: "Branch",
+                                            degree: "Degree",
+                                            year: "Year",
+                                            yearOfAdmission: "Admission Year",
+                                            passingYear: "Passing Year"
+                                        };
+
+                                        // Fields to show: required ones + Institution (always relevant)
+                                        const fieldsToShow = event?.requiredUserFields?.length
+                                            ? event.requiredUserFields
+                                            : ["name", "email", "identifier", "branch", "degree", "year", "yearOfAdmission", "passingYear"];
+
+                                        const items = fieldsToShow.map(key => ({
+                                            label: fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').trim(),
+                                            value: user?.[key],
+                                            key
+                                        }));
+
+                                        // Add Institution separately as it's common
+                                        items.push({ label: "Institution", value: reg.collegeName, key: "college" });
+
+                                        return items.map((item, idx) => (
+                                            <div key={item.key} className={`${item.key === 'name' || item.key === 'email' ? 'col-span-2' : ''}`}>
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{item.label}</p>
+                                                <p className="text-sm font-bold text-gray-900 break-words">{item.value || "Not set"}</p>
+                                            </div>
+                                        ));
+                                    })()}
+                                </div>
+                            </div>
+                        </div>
                         {/* Custom Form Answers Section */}
                         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                             <div className="px-8 py-6 border-b border-gray-50">
@@ -236,12 +287,14 @@ export default function MyRegistrationPage() {
                                         You can update your registration details at any time before the registration period ends.
                                         Your profile details are synced automatically.
                                     </p>
-                                    <button
-                                        onClick={() => navigate(`/events/${eventId}/register`, { state: { editRegistration: reg } })}
-                                        className="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition relative z-10 shadow-lg"
-                                    >
-                                        Update Registration
-                                    </button>
+                                    {!isRegistrationClosed && (
+                                        <button
+                                            onClick={() => navigate(`/events/${eventId}/register`, { state: { editRegistration: reg } })}
+                                            className="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition relative z-10 shadow-lg"
+                                        >
+                                            Update Registration
+                                        </button>
+                                    )}
                                 </>
                             )}
                         </div>

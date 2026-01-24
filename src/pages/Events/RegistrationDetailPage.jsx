@@ -144,9 +144,9 @@ export default function RegistrationDetailPage() {
                     <div className="space-y-6">
                         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-center">
                             <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-3xl mx-auto mb-4 ring-4 ring-white shadow-xl shadow-blue-500/10">
-                                {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : "U"}
                             </div>
-                            <h2 className="text-2xl font-black text-gray-900 leading-tight">{user.name}</h2>
+                            <h2 className="text-2xl font-black text-gray-900 leading-tight">{user?.name || "Anonymous"}</h2>
                             <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mt-1">Student Participant</p>
 
                             <div className="mt-8 pt-8 border-t border-gray-50 space-y-4">
@@ -156,7 +156,7 @@ export default function RegistrationDetailPage() {
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Email Address</p>
-                                        <p className="text-sm font-bold text-gray-900 truncate">{user.email}</p>
+                                        <p className="text-sm font-bold text-gray-900 truncate">{user?.email || "No email"}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 text-left">
@@ -228,17 +228,49 @@ export default function RegistrationDetailPage() {
                     {/* Main Info - Tubular Layout */}
                     <div className="md:col-span-2 space-y-8">
 
-                        {/* Academic Details Section */}
+                        {/* Submitted Details Section */}
                         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                             <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
                                 <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                                    <BookOpen className="w-4 h-4 text-blue-600" /> Academic Information
+                                    <BookOpen className="w-4 h-4 text-blue-600" /> Submitted Profile Data
                                 </h3>
                             </div>
-                            <div className="divide-y divide-gray-50">
-                                <DataRow icon={GraduationCap} label="Degree & Branch" value={`${user.degree} in ${user.branch}`} />
-                                <DataRow icon={Hash} label="Academic Year" value={`Year ${user.year} (Sem ${user.semester})`} />
-                                <DataRow icon={Calendar} label="Batch" value={`Admission: ${user.yearOfAdmission} | Passing: ${user.passingYear}`} />
+                            <div className="p-8">
+                                <div className="grid grid-cols-2 gap-6">
+                                    {(() => {
+                                        const fieldLabels = {
+                                            name: "Full Name",
+                                            email: "Email",
+                                            identifier: "Student ID",
+                                            branch: "Branch",
+                                            degree: "Degree",
+                                            year: "Year",
+                                            yearOfAdmission: "Admission Year",
+                                            passingYear: "Passing Year"
+                                        };
+
+                                        // Only show what was required at the time of registration
+                                        const fieldsToShow = event?.requiredUserFields?.length
+                                            ? event.requiredUserFields
+                                            : ["name", "email", "identifier", "branch", "degree", "year", "yearOfAdmission", "passingYear"];
+
+                                        const items = fieldsToShow.map(key => ({
+                                            label: fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').trim(),
+                                            value: user?.[key],
+                                            key
+                                        }));
+
+                                        // Always include Institution
+                                        items.push({ label: "Institution", value: reg.collegeName, key: "college" });
+
+                                        return items.map((item, idx) => (
+                                            <div key={item.key} className={`${item.key === 'name' || item.key === 'email' ? 'col-span-2' : ''}`}>
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{item.label}</p>
+                                                <p className="text-sm font-bold text-gray-900 break-words">{item.value || "Not set"}</p>
+                                            </div>
+                                        ));
+                                    })()}
+                                </div>
                             </div>
                         </div>
 

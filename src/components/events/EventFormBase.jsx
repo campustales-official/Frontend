@@ -22,9 +22,10 @@ const VISIBILITY_OPTIONS = [
 const REQUIRED_USER_FIELDS = [
     { value: "name", label: "Full Name", description: "Student's full name" },
     { value: "email", label: "Email", description: "College email address" },
+    { value: "identifier", label: "Student ID", description: "Roll No. / Enrollment / Scholar ID" },
     { value: "branch", label: "Branch", description: "e.g. Computer Science, Mechanical" },
     { value: "degree", label: "Degree", description: "e.g. B.Tech, M.Tech, MBA" },
-    { value: "semester", label: "Semester", description: "Current semester" },
+    // { value: "semester", label: "Semester", description: "Current semester" },
     { value: "year", label: "Year", description: "Current year of study" },
     { value: "yearOfAdmission", label: "Year of Admission", description: "When they joined" },
     { value: "passingYear", label: "Passing Year", description: "Expected graduation" },

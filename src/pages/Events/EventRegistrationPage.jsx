@@ -161,12 +161,19 @@ export default function EventRegistrationPage() {
                                 </h3>
                                 <div className="bg-gray-50/80 p-4 rounded-xl border border-gray-200 text-sm text-gray-600">
                                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
-                                        {(event.requiredUserFields?.length ? event.requiredUserFields : ["name", "email", "branch", "degree", "semester", "year", "yearOfAdmission", "passingYear"]).map(field => {
+                                        {(event.requiredUserFields?.length ? event.requiredUserFields : ["name", "email", "identifier", "branch", "degree", "year", "yearOfAdmission", "passingYear"]).map(field => {
                                             let value = me?.[field];
+
+                                            if (field === "identifier") {
+                                                value = me?.identifiers?.student?.value;
+                                            }
+
+                                            let label = field.replace(/([A-Z])/g, ' $1').trim();
+                                            if (field === "identifier") label = "Student ID";
 
                                             return (
                                                 <div key={field} className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-                                                    <span className="block text-[10px] font-bold text-gray-400 mb-1 capitalize">{field.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                                    <span className="block text-[10px] font-bold text-gray-400 mb-1 capitalize">{label}</span>
                                                     <div className="font-semibold text-gray-900 text-sm break-words leading-tight" title={value}>
                                                         {value || "Not set"}
                                                     </div>

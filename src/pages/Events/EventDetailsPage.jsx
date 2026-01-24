@@ -58,6 +58,9 @@ export default function EventDetailsPage() {
         isDisabled = true;
         buttonText = "Registration Closed";
         buttonSubtext = "Ended";
+    } else if (event.status !== "published") {
+        isDisabled = true;
+        buttonText = "Event isn't Open";
     }
 
     // Handle user action
@@ -216,7 +219,7 @@ export default function EventDetailsPage() {
 
                                 {event.status !== 'published' && (
                                     <div className="mt-4 p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg text-center border border-red-100">
-                                        Event is currently {event.status.replace('-', ' ')}
+                                        Event is currently {event.status.replace('_', ' ').toUpperCase()}
                                     </div>
                                 )}
 

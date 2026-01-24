@@ -241,7 +241,7 @@ export default function SignupForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Admission Year</label>
               <input name="yearOfAdmission" type="number" placeholder="2023" className={inputClass} />
             </div>
-            <div>
+            {/*<div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Semester</label>
               <div className="relative">
                 <select name="semester" className={inputClass + " appearance-none pr-10"}>
@@ -255,7 +255,7 @@ export default function SignupForm() {
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
-            </div>
+            </div>*/}
           </div>
         </>
       )}

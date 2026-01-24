@@ -38,7 +38,7 @@ export default function ProfilePage() {
         name: "",
         branch: "",
         degree: "",
-        semester: "",
+        // semester: "",
         year: "",
         yearOfAdmission: "",
         passingYear: "",
@@ -53,7 +53,7 @@ export default function ProfilePage() {
                 name: me.name || "",
                 branch: me.branch || "",
                 degree: me.degree || "",
-                semester: me.semester || "",
+                // semester: me.semester || "",
                 year: me.year || "",
                 yearOfAdmission: me.yearOfAdmission || "",
                 passingYear: me.passingYear || "",
@@ -97,7 +97,7 @@ export default function ProfilePage() {
             name: formData.name,
             branch: formData.branch,
             degree: formData.degree,
-            semester: Number(formData.semester) || formData.semester,
+            // semester: Number(formData.semester) || formData.semester,
             year: Number(formData.year) || formData.year,
             yearOfAdmission: Number(formData.yearOfAdmission) || formData.yearOfAdmission,
             passingYear: Number(formData.passingYear) || formData.passingYear,
@@ -245,14 +245,14 @@ export default function ProfilePage() {
                                         type="number"
                                         onChange={(val) => setFormData(prev => ({ ...prev, year: val }))}
                                     />
-                                    <EditableInfoItem
+                                    {/* <EditableInfoItem
                                         label="Semester"
                                         value={formData.semester}
                                         icon={<BookOpen className="w-4 h-4" />}
                                         isEditing={isEditing}
                                         type="number"
                                         onChange={(val) => setFormData(prev => ({ ...prev, semester: val }))}
-                                    />
+                                    />*/}
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <EditableInfoItem
