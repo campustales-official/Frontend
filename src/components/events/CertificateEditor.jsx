@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Move, Type, Type as TypeIcon, Bold, AlignCenter, AlignLeft, AlignRight,
-    Trash2, Plus, Image as ImageIcon, Info, ChevronRight, HelpCircle, Loader2
+    Trash2, Plus, Image as ImageIcon, Info, ChevronRight, HelpCircle, Loader2, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -19,7 +19,7 @@ const PDF_WIDTH = 841.89;
 const PDF_HEIGHT = 595.28;
 const A4_ASPECT_RATIO = PDF_WIDTH / PDF_HEIGHT; // 1.414275...
 
-export default function CertificateEditor({ event, initialData, onSave, isSaving }) {
+export default function CertificateEditor({ event, initialData, onSave, isSaving, onPreview, isPreviewing }) {
     const [background, setBackground] = useState(initialData?.backgroundImageUrl || null);
     const [backgroundFile, setBackgroundFile] = useState(null);
     const [orientation, setOrientation] = useState(initialData?.orientation || "landscape");
@@ -486,6 +486,17 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
                     </div>
 
                     <div className="mt-8 flex justify-end gap-4">
+                        {initialData && (
+                            <button
+                                type="button"
+                                onClick={onPreview}
+                                disabled={!background || isPreviewing}
+                                className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 transition disabled:opacity-50 flex items-center gap-3 shadow-xl active:scale-95"
+                            >
+                                {isPreviewing ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <Eye className="w-4 h-4 text-white" />}
+                                Preview Certificate
+                            </button>
+                        )}
                         <button
                             type="button"
                             onClick={handleFormSubmit}

@@ -180,6 +180,12 @@ export const deleteCertificateTemplate = async ({ collegeId, clubId, eventId }) 
     return res.data;
 };
 
+export const previewCertificateTemplate = async ({ collegeId, clubId, eventId }) => {
+    const basePath = getBasePath(collegeId, clubId);
+    const res = await axios.get(`${basePath}/${eventId}/template/preview`);
+    return res.data.data || res.data;
+};
+
 // Certificate Generation & Download
 export const generateCertificate = async ({ collegeId, clubId, eventId, registrationId }) => {
     const basePath = getBasePath(collegeId, clubId);

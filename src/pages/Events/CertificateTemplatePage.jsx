@@ -10,7 +10,7 @@ import { useMe } from "../../hooks/useMe";
 import {
     getEventDetails, getCertificateTemplate,
     createCertificateTemplate, updateCertificateTemplate,
-    deleteCertificateTemplate
+    deleteCertificateTemplate, previewCertificateTemplate
 } from "../../api/events.api";
 import CertificateEditor from "../../components/events/CertificateEditor";
 
@@ -78,8 +78,26 @@ export default function CertificateTemplatePage() {
         }
     });
 
+    const { mutate: handlePreview, isPending: previewPending } = useMutation({
+        mutationFn: () => previewCertificateTemplate({ collegeId, clubId, eventId }),
+        onSuccess: (res) => {
+            if (res.previewUrl) {
+                window.open(res.previewUrl, '_blank');
+            } else {
+                toast.error("Preview URL not found in response");
+            }
+        },
+        onError: (err) => {
+            toast.error(err.response?.data?.message || "Failed to generate preview");
+        }
+    });
+
     const onSave = (data, bgFile) => {
         handleSave({ data, bgFile });
+    };
+
+    const onPreview = () => {
+        handlePreview();
     };
 
     const onDeleteClick = () => {
@@ -158,6 +176,8 @@ export default function CertificateTemplatePage() {
                     initialData={template}
                     onSave={onSave}
                     isSaving={savePending}
+                    onPreview={onPreview}
+                    isPreviewing={previewPending}
                 />
             </div>
         </div>
