@@ -108,9 +108,12 @@ export default function EditClubPage() {
     };
 
     const addTag = () => {
-        if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-            setFormData(prev => ({ ...prev, tags: [...prev.tags, tagInput.trim()] }));
-            setTagInput("");
+        if (tagInput.trim()) {
+            const newTags = tagInput.split(',').map(t => t.trim()).filter(t => t && !formData.tags.includes(t));
+            if (newTags.length > 0) {
+                setFormData(prev => ({ ...prev, tags: [...prev.tags, ...newTags] }));
+                setTagInput("");
+            }
         }
     };
 
@@ -119,9 +122,12 @@ export default function EditClubPage() {
     };
 
     const addPosition = () => {
-        if (positionInput.trim() && !formData.availablePositions.includes(positionInput.trim())) {
-            setFormData(prev => ({ ...prev, availablePositions: [...prev.availablePositions, positionInput.trim()] }));
-            setPositionInput("");
+        if (positionInput.trim()) {
+            const newPositions = positionInput.split(',').map(p => p.trim()).filter(p => p && !formData.availablePositions.includes(p));
+            if (newPositions.length > 0) {
+                setFormData(prev => ({ ...prev, availablePositions: [...prev.availablePositions, ...newPositions] }));
+                setPositionInput("");
+            }
         }
     };
 

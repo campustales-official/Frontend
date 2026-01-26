@@ -31,6 +31,8 @@ export default function ClubsPage({ collegeId }) {
         return view === "requests" ? !isApproved : isApproved;
     });
 
+    const pendingCount = allClubs?.filter(c => !c.approvedByCollege).length || 0;
+
     const approveMutation = useMutation({
         mutationFn: ({ clubId }) => approveClub({ collegeId, clubId }),
         onSuccess: () => {
@@ -126,13 +128,16 @@ export default function ClubsPage({ collegeId }) {
                                 </button>
                                 <button
                                     onClick={() => setView("requests")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all ${view === "requests"
+                                    className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black transition-all ${view === "requests"
                                         ? "bg-gray-900 text-white shadow-lg"
                                         : "text-gray-500 hover:bg-gray-50"
                                         }`}
                                 >
                                     <Inbox className="w-3.5 h-3.5" />
                                     Requests
+                                    {pendingCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                                    )}
                                 </button>
                             </div>
                         )}

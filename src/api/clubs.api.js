@@ -86,7 +86,9 @@ export const removeClubMember = async ({ collegeId, clubId, userId }) => {
 };
 
 export const registerClub = async ({ collegeId, data }) => {
-    const res = await axios.post(`/colleges/${collegeId}/clubs`, data);
+    const res = await axios.post(`/colleges/${collegeId}/clubs`, data, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
     return res.data.data;
 };
 

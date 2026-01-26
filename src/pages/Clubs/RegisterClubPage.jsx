@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { registerClub } from "../../api/clubs.api";
@@ -6,7 +6,7 @@ import { useMe } from "../../hooks/useMe";
 import {
     ArrowLeft, Plus, X, Info, Instagram, Linkedin,
     Globe, Twitter, Facebook, Mail, ShieldAlert, Rocket,
-    User, Calendar, Hash
+    User, Calendar, Hash, Upload, ImageIcon, Loader2
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -38,13 +38,56 @@ export default function RegisterClubPage() {
         }
     });
 
+    // Load draft on mount
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        if (me?.id) {
+            const saved = localStorage.getItem(`draft_club_reg_${me?.id}`);
+            if (saved) {
+                try {
+                    setFormData(prev => ({ ...prev, ...JSON.parse(saved) }));
+                    toast.info("Restored draft from previous session");
+                } catch (e) {
+                    console.error("Failed to parse draft", e);
+                }
+            }
+            setIsLoaded(true);
+        }
+    }, [me?.id]);
+
+    // Save draft on change
+    useEffect(() => {
+        if (me?.id && isLoaded) {
+            localStorage.setItem(`draft_club_reg_${me?.id}`, JSON.stringify(formData));
+        }
+    }, [formData, me?.id, isLoaded]);
+
     const [tagInput, setTagInput] = useState("");
     const [positionInput, setPositionInput] = useState("");
+
+    const [files, setFiles] = useState({ logo: null, cover: null });
+    const [logoPreview, setLogoPreview] = useState(null);
+    const [coverPreview, setCoverPreview] = useState(null);
+
+    const handleFileChange = (e, type) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFiles(prev => ({ ...prev, [type]: file }));
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (type === 'logo') setLogoPreview(reader.result);
+                else setCoverPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const { mutate: handleRegister, isPending } = useMutation({
         mutationFn: (data) => registerClub({ collegeId, data }),
         onSuccess: () => {
             toast.success("Club registration submitted successfully!");
+            localStorage.removeItem(`draft_club_reg_${me?.id}`);
             queryClient.invalidateQueries({ queryKey: ["clubs", collegeId] });
             navigate("/clubs");
         },
@@ -76,9 +119,12 @@ export default function RegisterClubPage() {
     };
 
     const addTag = () => {
-        if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-            setFormData(prev => ({ ...prev, tags: [...prev.tags, tagInput.trim()] }));
-            setTagInput("");
+        if (tagInput.trim()) {
+            const newTags = tagInput.split(',').map(t => t.trim()).filter(t => t && !formData.tags.includes(t));
+            if (newTags.length > 0) {
+                setFormData(prev => ({ ...prev, tags: [...prev.tags, ...newTags] }));
+                setTagInput("");
+            }
         }
     };
 
@@ -87,9 +133,12 @@ export default function RegisterClubPage() {
     };
 
     const addPosition = () => {
-        if (positionInput.trim() && !formData.availablePositions.includes(positionInput.trim())) {
-            setFormData(prev => ({ ...prev, availablePositions: [...prev.availablePositions, positionInput.trim()] }));
-            setPositionInput("");
+        if (positionInput.trim()) {
+            const newPositions = positionInput.split(',').map(p => p.trim()).filter(p => p && !formData.availablePositions.includes(p));
+            if (newPositions.length > 0) {
+                setFormData(prev => ({ ...prev, availablePositions: [...prev.availablePositions, ...newPositions] }));
+                setPositionInput("");
+            }
         }
     };
 
@@ -106,7 +155,28 @@ export default function RegisterClubPage() {
             return;
         }
 
-        handleRegister(formData);
+        const data = new FormData();
+
+        // Append simple fields
+        data.append("name", formData.name);
+        data.append("description", formData.description);
+        data.append("category", formData.category);
+        data.append("establishedYear", formData.establishedYear);
+        data.append("isOfficial", formData.isOfficial);
+
+        // Append Arrays
+        formData.tags.forEach(t => data.append("tags", t));
+        formData.availablePositions.forEach(p => data.append("availablePositions", p));
+
+        // Append Objects (backend expects JSON string or flat fields? using JSON string as per RegisterCollege pattern)
+        data.append("facultyAdvisor", JSON.stringify(formData.facultyAdvisor));
+        data.append("socialLinks", JSON.stringify(formData.socialLinks));
+
+        // Append Files
+        if (files.logo) data.append("logo", files.logo);
+        if (files.cover) data.append("coverImage", files.cover);
+
+        handleRegister(data);
     };
 
     return (
@@ -128,18 +198,60 @@ export default function RegisterClubPage() {
 
             <div className="max-w-4xl mx-auto px-4 mt-8 space-y-8">
                 {/* Verification Warning */}
-                <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 flex items-start gap-4">
-                    <div className="p-2 bg-white rounded-xl shadow-sm">
-                        <ShieldAlert className="w-5 h-5 text-amber-500" />
+                {/* Visuals Section */}
+                <section className="bg-white rounded-2xl border p-6 shadow-sm overflow-hidden">
+                    <h2 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
+                        <ImageIcon className="w-5 h-5 text-blue-500" /> Visual Identity
+                    </h2>
+
+                    <div className="space-y-6">
+                        {/* Cover Image */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-3">Cover Image</label>
+                            <div
+                                className="relative aspect-[4/1] h-auto w-full rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center cursor-pointer group overflow-hidden"
+                                onClick={() => document.getElementById('coverInput').click()}
+                            >
+                                {coverPreview ? (
+                                    <img src={coverPreview} className="w-full h-full object-cover" alt="Cover" />
+                                ) : (
+                                    <div className="text-center">
+                                        <div className="bg-white p-3 rounded-full shadow-sm mb-2 inline-block"><Upload className="w-5 h-5 text-gray-400" /></div>
+                                        <p className="text-sm text-gray-500 font-medium">Click to upload cover image</p>
+                                        <p className="text-xs text-gray-400 mt-1">4:1 aspect ratio (e.g. 1600×400)</p>
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                    <p className="text-white font-bold flex items-center gap-2">Change Cover <Upload className="w-4 h-4" /></p>
+                                </div>
+                                <input id="coverInput" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'cover')} />
+                            </div>
+                        </div>
+
+                        {/* Logo */}
+                        <div className="flex items-end gap-6">
+                            <div
+                                className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center cursor-pointer group shrink-0 overflow-hidden"
+                                onClick={() => document.getElementById('logoInput').click()}
+                            >
+                                {logoPreview ? (
+                                    <img src={logoPreview} className="w-full h-full object-cover" alt="Logo" />
+                                ) : (
+                                    <Upload className="w-6 h-6 text-gray-300" />
+                                )}
+                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                    <Upload className="w-5 h-5 text-white" />
+                                </div>
+                                <input id="logoInput" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'logo')} />
+                            </div>
+                            <div className="space-y-1 pb-1">
+                                <h3 className="font-bold text-gray-900">Club Logo</h3>
+                                <p className="text-xs text-gray-500 max-w-sm">Upload a square image. This will be displayed in the club list and dashboard.</p>
+                                <button type="button" onClick={() => document.getElementById('logoInput').click()} className="text-sm text-blue-600 font-bold hover:underline">Change Logo</button>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-sm font-bold text-amber-900 uppercase tracking-wider mb-1">Administrative Verification Required</h3>
-                        <p className="text-sm text-amber-700 leading-relaxed font-medium">
-                            Clubs created are non-operational until verified by the college admin. Please contact your college administration to get it verified.
-                            <span className="block mt-2 text-xs opacity-80">Note: You can add the club logo and banner image from the club edit option once verification is requested or approved.</span>
-                        </p>
-                    </div>
-                </div>
+                </section>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Important Information */}

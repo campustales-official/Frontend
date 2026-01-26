@@ -206,7 +206,7 @@ export default function ClubDetailsPage() {
                 </div>
 
                 {/* Info Container */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 relative pb-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 relative pb-2">
                     <div className="flex flex-col md:flex-row items-start md:items-end -mt-12 md:-mt-16 gap-4 md:gap-6 mb-6">
                         {/* Logo */}
                         <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white bg-white shadow-md overflow-hidden relative z-10">
@@ -214,8 +214,8 @@ export default function ClubDetailsPage() {
                         </div>
 
                         {/* Text Info */}
-                        <div className="flex-1 pt-2 md:pt-0 text-center md:text-left">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center md:justify-start gap-2">
+                        <div className="flex-1 pt-0 md:pt-2 text-left">
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center md:justify-start">
                                 {club.name}
                                 {club.isOfficial && (
                                     <span className="bg-blue-100 text-blue-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full tracking-wide">
@@ -237,66 +237,17 @@ export default function ClubDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
-                            {/* Join Club Button */}
-                            {!isMember ? (
-                                <button
-                                    onClick={() => !joinPending && handleJoin()}
-                                    disabled={joinPending}
-                                    className="w-36 md:w-40 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] hover:scale-110 disabled:opacity-70 disabled:cursor-not-allowed shrink-0"
-                                >
-                                    {joinPending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <div className="flex items-center gap-2">
-                                            <UserPlus className="w-4 h-4" />
-                                            <span>Join Club</span>
-                                        </div>
-                                    )}
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleLeaveClick}
-                                    disabled={leavePending}
-                                    className="w-36 md:w-40 flex items-center justify-center gap-2 bg-green-50 hover:bg-red-50 text-green-700 hover:text-red-600 border border-green-200 hover:border-red-200 px-6 py-2 rounded-lg font-medium shadow-sm transition-all group shrink-0"
-                                >
-                                    {leavePending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <div className="flex items-center gap-2 group-hover:hidden">
-                                                <CheckCircle className="w-4 h-4" />
-                                                <span>Joined</span>
-                                            </div>
-                                            <div className="hidden group-hover:flex items-center gap-2 text-red-600">
-                                                <LogOut className="w-4 h-4" />
-                                                <span>Leave</span>
-                                            </div>
-                                        </>
-                                    )}
-                                </button>
-                            )}
 
-                            <button
-                                onClick={() => navigate(`/club/${clubId}/members`)}
-                                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-4 py-2 rounded-lg font-medium transition shadow-sm"
-                            >
-                                <Users className="w-4 h-4" />
-                                Member List
-                            </button>
-                        </div>
                     </div>
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                        {club.description}
+                    </p>
 
-                    {/* Description & Links */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                        <div className="flex-1">
-                            <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                                {club.description}
-                            </p>
-
+                    {/* Links, Buttons & Faculty */}
+                    <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+                        <div className="flex-1 flex flex-col gap-4">
                             {/* Social Links */}
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 flex-wrap">
                                 {club.socialLinks?.website && (
                                     <a href={club.socialLinks.website} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-blue-600 transition" title="Website">
                                         <Globe className="w-5 h-5" />
@@ -328,11 +279,60 @@ export default function ClubDetailsPage() {
                                     </a>
                                 )}
                             </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2 flex-row">
+                                {!isMember ? (
+                                    <button
+                                        onClick={() => !joinPending && handleJoin()}
+                                        disabled={joinPending}
+                                        className="w-40 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed shrink-0"
+                                    >
+                                        {joinPending ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <div className="flex items-center gap-2">
+                                                <UserPlus className="w-4 h-4" />
+                                                <span>Join Club</span>
+                                            </div>
+                                        )}
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleLeaveClick}
+                                        disabled={leavePending}
+                                        className="w-40 flex items-center justify-center gap-2 bg-green-50 hover:bg-red-50 text-green-700 hover:text-red-600 border border-green-200 hover:border-red-200 px-6 py-2 rounded-lg font-medium shadow-sm transition-all group shrink-0"
+                                    >
+                                        {leavePending ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-2 group-hover:hidden">
+                                                    <CheckCircle className="w-4 h-4" />
+                                                    <span>Joined</span>
+                                                </div>
+                                                <div className="hidden group-hover:flex items-center gap-2 text-red-600">
+                                                    <LogOut className="w-4 h-4" />
+                                                    <span>Leave</span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+
+                                <button
+                                    onClick={() => navigate(`/club/${clubId}/members`)}
+                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-4 py-2 rounded-lg font-medium transition shadow-sm"
+                                >
+                                    <Users className="w-4 h-4" />
+                                    Member List
+                                </button>
+                            </div>
                         </div>
 
                         {/* Faculty Advisor Card */}
                         {club.facultyAdvisor && (
-                            <div className="md:w-80 bg-gray-50 rounded-xl p-4 border border-gray-100 flex items-center gap-4">
+                            <div className="flex-1 min-w-60 w-full md:w-auto md:max-w-80 bg-gray-50 rounded-xl p-2 border border-gray-100 flex items-center gap-4 shadow-sm">
                                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                                     <User className="w-5 h-5" />
                                 </div>
