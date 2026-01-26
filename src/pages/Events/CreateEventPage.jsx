@@ -20,6 +20,7 @@ export default function CreateEventPage() {
     // Use ref to track publish intent (avoids async state issues)
     const shouldPublishRef = useRef(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [hasSucceeded, setHasSucceeded] = useState(false);
 
     const { mutate: handleCreate, isPending } = useMutation({
         mutationFn: async (formData) => {
@@ -34,6 +35,10 @@ export default function CreateEventPage() {
         onSuccess: (event) => {
             const action = shouldPublishRef.current ? "published" : "saved as draft";
             toast.success(`Event ${action} successfully!`);
+
+            setHasSucceeded(true); // Permanent block for auto-save
+            localStorage.removeItem(`event_draft_${me?.id}`);
+
             queryClient.invalidateQueries({ queryKey: ["events"] });
             queryClient.invalidateQueries({ queryKey: ["feed"] });
             navigate(`/events/${event.id}/manage`);
@@ -54,6 +59,11 @@ export default function CreateEventPage() {
         document.getElementById("create-event-form").requestSubmit();
     };
 
+    const handleDiscard = () => {
+        localStorage.removeItem(`event_draft_${me?.id}`);
+        navigate(-1);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50/50 pb-20">
             {/* Header */}
@@ -69,13 +79,14 @@ export default function CreateEventPage() {
                 id="create-event-form"
                 onSubmit={onSubmit}
                 initialData={{ visibility: searchParams.get("visibility") || "college" }}
+                isSubmitting={isPending || hasSucceeded}
             />
 
             {/* Sticky Actions Bar */}
             <div className="fixed bottom-15 sm:bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 sm:py-4 py-2 sm:px-6 px-2 z-30">
                 <div className="max-w-6xl mx-auto flex items-center justify-between">
                     <button
-                        type="button" onClick={() => navigate(-1)}
+                        type="button" onClick={handleDiscard}
                         className="text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2 sm:px-16"
                     >
                         <X className="w-4 h-4" /> Discard Changes

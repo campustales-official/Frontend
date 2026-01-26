@@ -52,9 +52,6 @@ export default function EventItem({ item, actions, showManageButton = false }) {
             <div className="flex-1 p-5 flex flex-col">
                 {/* Header */}
                 <div className="flex flex-row-reverse sm:flex-row items-center justify-between mb-2">
-                    <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                        Event
-                    </span>
                     <div className="text-xs text-gray-500 font-medium">
                         {college?.name} {club && `• ${club.name}`}
                     </div>

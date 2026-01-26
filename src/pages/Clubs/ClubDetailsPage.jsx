@@ -157,6 +157,8 @@ export default function ClubDetailsPage() {
         if (action === 'edit') {
             if (item.type === 'post') {
                 setEditingPost(item);
+            } else if (item.type === 'event') {
+                navigate(`/events/${item.id}/edit`);
             } else {
                 toast.info("Editing not implemented for this type yet.");
             }

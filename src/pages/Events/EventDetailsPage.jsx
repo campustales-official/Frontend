@@ -76,7 +76,7 @@ export default function EventDetailsPage() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             {/* 1. Clean Banner Image */}
-            <div className="h-[40vh] md:h-[50vh] w-full bg-gray-200 overflow-hidden relative">
+            <div className="w-full bg-gray-100 relative overflow-hidden group">
                 {/* Floating Back Button */}
                 <button
                     onClick={() => navigate(-1)}
@@ -89,10 +89,10 @@ export default function EventDetailsPage() {
                     <img
                         src={event.bannerImageUrl}
                         alt={event.title}
-                        className="w-full h-full object-cover object-center"
+                        className="w-full h-auto max-h-[70vh] object-contain mx-auto bg-black/5"
                     />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-900 to-gray-900 flex items-center justify-center">
+                    <div className="h-[40vh] w-full bg-gradient-to-br from-blue-900 to-gray-900 flex items-center justify-center">
                         <span className="text-white/20 font-black text-6xl uppercase">Event</span>
                     </div>
                 )}

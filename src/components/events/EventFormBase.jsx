@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import {
     Info, Calendar, MapPin, Eye, Upload, Plus,
     Trash2, ChevronDown, CheckCircle2, AlertCircle,
-    Type, AlignLeft, Hash, List, FileText, Award
+    Type, AlignLeft, Hash, List, FileText, Award, X
 } from "lucide-react";
+import { useMe } from "../../hooks/useMe";
+import { toast } from "react-toastify";
 
 const QUESTION_TYPES = [
     { value: "text", label: "Short Text", icon: Type },
@@ -34,7 +36,8 @@ const REQUIRED_USER_FIELDS = [
 export default function EventFormBase({
     initialData = {},
     onSubmit,
-    id = "event-form"
+    id = "event-form",
+    isSubmitting = false
 }) {
     const [formData, setFormData] = useState({
         title: "",
@@ -53,9 +56,20 @@ export default function EventFormBase({
 
     const [banner, setBanner] = useState(null);
     const [bannerPreview, setBannerPreview] = useState(null);
+    const { data: me } = useMe();
+    const [isLoaded, setIsLoaded] = useState(false);
 
+    // Track raw text for options so commas don't break typing
+    const [optionsText, setOptionsText] = useState({});
+
+    // Unified Initialization: Load draft or initialData
     useEffect(() => {
-        if (initialData && Object.keys(initialData).length > 0) {
+        if (!me?.id) return; // Wait for user info
+
+        const isEditing = initialData?.id || initialData?._id;
+
+        // 1. If Editing, always trust initialData from server
+        if (isEditing) {
             setFormData({
                 title: initialData.title || "",
                 description: initialData.description || "",
@@ -74,7 +88,41 @@ export default function EventFormBase({
                 setBannerPreview(initialData.bannerImageUrl);
             }
         }
-    }, [initialData]);
+        // 2. If Creating, try loading draft first
+        else {
+            const saved = localStorage.getItem(`event_draft_${me.id}`);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    setFormData(prev => ({ ...prev, ...parsed }));
+
+                    // Pre-fill optionsText for dropdowns
+                    const initialOptionsText = {};
+                    parsed.registrationQuestions?.forEach(q => {
+                        if (q.type === 'dropdown' && q.options) {
+                            initialOptionsText[q.key] = q.options.join(", ");
+                        }
+                    });
+                    setOptionsText(initialOptionsText);
+                } catch (e) {
+                    console.error("Failed to parse event draft", e);
+                }
+            }
+        }
+
+        setIsLoaded(true);
+    }, [me?.id, initialData]);
+
+    // Save draft on change (only for new events)
+    useEffect(() => {
+        const isEditing = initialData?.id || initialData?._id;
+
+        // CRITICAL: Check isSubmitting to prevent re-saving draft after it was cleared in onSuccess
+        if (me?.id && isLoaded && !isEditing && !isSubmitting) {
+            const draftKey = `event_draft_${me.id}`;
+            localStorage.setItem(draftKey, JSON.stringify(formData));
+        }
+    }, [formData, me?.id, isLoaded, initialData, isSubmitting]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -120,6 +168,12 @@ export default function EventFormBase({
                 q.key === key ? { ...q, [field]: value } : q
             )
         }));
+    };
+
+    const handleOptionsChange = (key, text) => {
+        setOptionsText(prev => ({ ...prev, [key]: text }));
+        const optionsArray = text.split(",").map(o => o.trim()).filter(o => o);
+        updateQuestion(key, "options", optionsArray);
     };
 
     const toggleUserField = (fieldValue) => {
@@ -391,8 +445,8 @@ export default function EventFormBase({
                                                     <input
                                                         type="text"
                                                         placeholder="Options (comma separated)"
-                                                        value={q.options.join(", ")}
-                                                        onChange={(e) => updateQuestion(q.key, "options", e.target.value.split(",").map(o => o.trim()).filter(o => o))}
+                                                        value={optionsText[q.key] ?? q.options.join(", ")}
+                                                        onChange={(e) => handleOptionsChange(q.key, e.target.value)}
                                                         className="w-full px-3 py-1.5 rounded-lg border border-gray-100 bg-white text-xs text-gray-900 outline-none focus:border-blue-400"
                                                     />
                                                 </div>
