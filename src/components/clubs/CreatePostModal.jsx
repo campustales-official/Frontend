@@ -147,7 +147,7 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId, is
                 )}
 
                 {/* Visibility Selector */}
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="sm:flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 ">
                     <span className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">Visibility:</span>
                     <div className="flex items-center gap-1">
                         {[

@@ -71,6 +71,9 @@ export default function SignupForm() {
       ...formData,
       collegeId: college?.id,
       roleInCollege: role,
+      year: formData.year ? parseInt(formData.year) : undefined,
+      yearOfAdmission: formData.yearOfAdmission ? parseInt(formData.yearOfAdmission) : undefined,
+      passingYear: formData.passingYear ? parseInt(formData.passingYear) : undefined,
       identifier: {
         type: getIdentifierType(),
         value: identifierValue,
@@ -282,12 +285,12 @@ export default function SignupForm() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Admission Year</label>
               <input name="yearOfAdmission" type="number" placeholder="2023" className={inputClass} />
             </div>
-            {/*<div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Semester</label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Year</label>
               <div className="relative">
-                <select name="semester" className={inputClass + " appearance-none pr-10"}>
+                <select name="year" className={inputClass + " appearance-none pr-10"}>
                   <option value="">Select</option>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                  {[1, 2, 3, 4, 5].map((s) => (
                     <option key={s} value={s}>
                       {s}
                       {s === 1 ? "st" : s === 2 ? "nd" : s === 3 ? "rd" : "th"}
@@ -296,7 +299,7 @@ export default function SignupForm() {
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
-            </div>*/}
+            </div>
           </div>
         </>
       )}

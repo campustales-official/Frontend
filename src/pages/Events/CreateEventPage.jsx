@@ -58,12 +58,7 @@ export default function CreateEventPage() {
         <div className="min-h-screen bg-gray-50/50 pb-20">
             {/* Header */}
             <div className="bg-white border-b border-gray-100">
-                <div className="max-w-6xl mx-auto px-6 py-10">
-                    <div className="flex items-center gap-2 text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">
-                        <span>Events</span>
-                        <span>/</span>
-                        <span className="text-blue-600">Create New Event</span>
-                    </div>
+                <div className="max-w-6xl mx-auto px-6 py-5">
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">Create New Event</h1>
                     <p className="text-gray-500 mt-2 font-medium">Fill in the details below to organize a new event for your community.</p>
                 </div>
@@ -77,11 +72,11 @@ export default function CreateEventPage() {
             />
 
             {/* Sticky Actions Bar */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 py-4 px-6 z-30">
+            <div className="fixed bottom-15 sm:bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 sm:py-4 py-2 sm:px-6 px-2 z-30">
                 <div className="max-w-6xl mx-auto flex items-center justify-between">
                     <button
                         type="button" onClick={() => navigate(-1)}
-                        className="text-sm font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2"
+                        className="text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2 sm:px-16"
                     >
                         <X className="w-4 h-4" /> Discard Changes
                     </button>
@@ -91,7 +86,7 @@ export default function CreateEventPage() {
                             type="button"
                             disabled={isPending}
                             onClick={() => triggerSubmit(false)}
-                            className="text-sm font-bold text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-xl transition flex items-center gap-2"
+                            className="text-xs sm:text-sm font-bold text-blue-600 hover:bg-blue-50 sm:px-6 sm:py-3 rounded-xl transition flex items-center gap-2"
                         >
                             {isPending && !isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                             Save as Draft
@@ -100,7 +95,7 @@ export default function CreateEventPage() {
                             type="button"
                             disabled={isPending}
                             onClick={() => triggerSubmit(true)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold transition flex items-center gap-2 disabled:opacity-70 shadow-lg shadow-blue-500/20 active:scale-95"
+                            className="bg-blue-600 hover:bg-blue-700 text-white sm:px-8 sm:py-3 py-2 px-1 text-xs sm:text-sm rounded-xl font-bold transition flex items-center gap-2 disabled:opacity-70 shadow-lg shadow-blue-500/20 active:scale-95"
                         >
                             {isPending && isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                             Publish Event
