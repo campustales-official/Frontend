@@ -4,7 +4,7 @@ import AnnouncementItem from "../../components/feed/AnnouncementItem";
 import FeedSkeleton from "../../components/feed/FeedSkeleton";
 import DataError from "../../components/common/DataError";
 
-export default function AnnouncementsPage({ scope = "college", clubId = null, collegeId }) {
+export default function AnnouncementsPage({ scope = "global", clubId = null, collegeId }) {
     const {
         data,
         fetchNextPage,

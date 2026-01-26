@@ -126,7 +126,7 @@ function GuardedRoutes() {
       {/* Dashboard Routes */}
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<FeedPage scope="global" collegeId={me.college?.id} />} />
-        <Route path="announcements" element={<AnnouncementsPage scope="college" collegeId={me.college?.id} />} />
+        <Route path="announcements" element={<AnnouncementsPage scope="global" collegeId={me.college?.id} />} />
         <Route path="college" element={<CollegeDashboard />} />
         <Route path="clubs" element={<ClubsPage collegeId={me.college?.id} />} />
         <Route path="clubs/register" element={<RegisterClubPage />} />

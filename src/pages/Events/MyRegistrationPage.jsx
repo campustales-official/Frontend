@@ -37,7 +37,7 @@ export default function MyRegistrationPage() {
         enabled: !!eventId
     });
 
-    const isRegistrationClosed = event?.registrationEndAt ? new Date(event.registrationEndAt) < new Date() : false;
+    const isRegistrationClosed = (event?.status === 'published' && event?.registrationEndAt) ? new Date(event.registrationEndAt) < new Date() : false;
 
     const { mutate: handleCancel, isPending: cancelPending } = useMutation({
         mutationFn: () => cancelRegistration(registrationId),
@@ -148,7 +148,7 @@ export default function MyRegistrationPage() {
 
                         {/* Danger Zone */}
                         {!isRegistrationClosed && (
-                            <div className="bg-red-50 rounded-3xl border border-red-100 p-6">
+                            <div className="bg-red-50 rounded-3xl border border-red-100 p-6 sm:block hidden">
                                 <h3 className="text-xs font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
                                     <AlertTriangle className="w-3.5 h-3.5" /> Danger Zone
                                 </h3>
@@ -260,46 +260,67 @@ export default function MyRegistrationPage() {
                         </div>
 
                         {/* Extra help card */}
-                        <div className="bg-blue-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+                        {(!isRegistrationClosed || reg.certificateId) && (
+                            <div className="bg-blue-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
 
-                            {reg.certificateId ? (
-                                <>
-                                    <h3 className="text-lg font-black mb-2 relative z-10 flex items-center gap-2">
-                                        <Award className="w-6 h-6" /> Congratulations!
-                                    </h3>
-                                    <p className="text-sm font-bold text-blue-100 leading-relaxed mb-6 relative z-10">
-                                        Your participation has been recognized. You can now download your digital certificate.
-                                    </p>
-                                    <a
-                                        href={getCertificateDownloadUrl(reg.certificateId)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition relative z-10 shadow-lg"
-                                    >
-                                        <Download className="w-4 h-4" /> Download Certificate
-                                    </a>
-                                </>
-                            ) : (
-                                <>
-                                    <h3 className="text-lg font-black mb-2 relative z-10">Need to make changes?</h3>
-                                    <p className="text-sm font-bold text-blue-100 leading-relaxed mb-6 relative z-10">
-                                        You can update your registration details at any time before the registration period ends.
-                                        Your profile details are synced automatically.
-                                    </p>
-                                    {!isRegistrationClosed && (
+                                {reg.certificateId ? (
+                                    <>
+                                        <h3 className="text-lg font-black mb-2 relative z-10 flex items-center gap-2">
+                                            <Award className="w-6 h-6" /> Congratulations!
+                                        </h3>
+                                        <p className="text-sm font-bold text-blue-100 leading-relaxed mb-6 relative z-10">
+                                            Your participation has been recognized. You can now download your digital certificate.
+                                        </p>
+                                        <a
+                                            href={getCertificateDownloadUrl(reg.certificateId)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition relative z-10 shadow-lg"
+                                        >
+                                            <Download className="w-4 h-4" /> Download Certificate
+                                        </a>
+                                    </>
+                                ) : (
+                                    <div>
+                                        <h3 className="text-lg font-black mb-2 relative z-10">Need to make changes?</h3>
+                                        <p className="text-sm font-bold text-blue-100 leading-relaxed mb-6 relative z-10">
+                                            You can update your registration details at any time before the registration period ends.
+                                            Your profile details are synced automatically.
+                                        </p>
+
                                         <button
                                             onClick={() => navigate(`/events/${eventId}/register`, { state: { editRegistration: reg } })}
                                             className="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition relative z-10 shadow-lg"
                                         >
                                             Update Registration
                                         </button>
-                                    )}
-                                </>
-                            )}
-                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
+
+                {/* Mobile Danger Zone */}
+                {!isRegistrationClosed && (
+                    <div className="bg-red-50 rounded-3xl border border-red-100 p-6 block sm:hidden">
+                        <h3 className="text-xs font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <AlertTriangle className="w-3.5 h-3.5" /> Danger Zone
+                        </h3>
+                        <p className="text-[11px] text-red-500 font-bold leading-relaxed mb-4">
+                            If you can no longer attend this event, please cancel your registration to open up space for others.
+                        </p>
+                        <button
+                            onClick={onCancelClick}
+                            disabled={cancelPending}
+                            className="w-full bg-white border border-red-200 text-red-600 font-bold py-2.5 rounded-xl text-xs hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                        >
+                            {cancelPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                            Cancel Registration
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

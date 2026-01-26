@@ -47,7 +47,6 @@ export default function RegisterClubPage() {
             if (saved) {
                 try {
                     setFormData(prev => ({ ...prev, ...JSON.parse(saved) }));
-                    toast.info("Restored draft from previous session");
                 } catch (e) {
                     console.error("Failed to parse draft", e);
                 }
@@ -198,6 +197,18 @@ export default function RegisterClubPage() {
 
             <div className="max-w-4xl mx-auto px-4 mt-8 space-y-8">
                 {/* Verification Warning */}
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                        <ShieldAlert className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black text-amber-900 uppercase tracking-widest leading-none mt-1">Manual Verification Required</h3>
+                        <p className="text-xs font-bold text-amber-700/80 mt-2 leading-relaxed">
+                            Every club registration must be manually verified and approved by the college authorities.
+                            Your club will not be visible to other students until it has been reviewed and cleared.
+                        </p>
+                    </div>
+                </div>
                 {/* Visuals Section */}
                 <section className="bg-white rounded-2xl border p-6 shadow-sm overflow-hidden">
                     <h2 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
@@ -380,12 +391,12 @@ export default function RegisterClubPage() {
                                     <input
                                         type="text" value={positionInput} onChange={(e) => setPositionInput(e.target.value)}
                                         onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addPosition())}
-                                        className="flex-1 px-5 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 font-bold"
+                                        className="flex-1 px-4 py-4 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:border-blue-500 font-bold"
                                         placeholder="e.g. Coordinator, Tech Lead"
                                     />
                                     <button
                                         type="button" onClick={addPosition}
-                                        className="px-6 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition font-black uppercase text-xs tracking-widest"
+                                        className="sm:px-6 px-2 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-100 transition font-black uppercase text-xs tracking-widest"
                                     >
                                         Add
                                     </button>
@@ -411,7 +422,7 @@ export default function RegisterClubPage() {
                                     />
                                     <button
                                         type="button" onClick={addTag}
-                                        className="px-6 bg-gray-50 text-gray-600 rounded-2xl hover:bg-gray-100 transition font-black uppercase text-xs tracking-widest border border-gray-100"
+                                        className="sm:px-6 bg-gray-50 text-gray-600 rounded-2xl hover:bg-gray-100 transition font-black uppercase text-xs tracking-widest border border-gray-100"
                                     >
                                         Add
                                     </button>

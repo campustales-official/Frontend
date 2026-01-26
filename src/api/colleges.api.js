@@ -29,7 +29,7 @@ export const createCollegeAnnouncement = async ({ collegeId, title, message, exp
   const res = await api.post(`/colleges/${collegeId}/announcements`, {
     title,
     message,
-    priority: "info",
+    priority: "important",
     expiresAt
   });
   return res.data.data;

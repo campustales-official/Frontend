@@ -58,12 +58,7 @@ export default function UpdateEventPage() {
         <div className="min-h-screen bg-gray-50/50 pb-20">
             {/* Header */}
             <div className="bg-white border-b border-gray-100">
-                <div className="max-w-6xl mx-auto px-6 py-10">
-                    <div className="flex items-center gap-2 text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">
-                        <span>Events</span>
-                        <span>/</span>
-                        <span className="text-blue-600">Edit Event Details</span>
-                    </div>
+                <div className="max-w-6xl mx-auto px-6 py-5">
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">Edit Event Details</h1>
                     <p className="text-gray-500 mt-2 font-medium tracking-tight">Update information for your event. Status cannot be changed here.</p>
                 </div>
