@@ -46,7 +46,7 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
             { text: "This is to certify that", x: 50, y: 40, fontSize: 0.8, fontWeight: "normal", color: "#666666", align: "center", width: 60 },
             { text: "{{Student_full_name}}", x: 50, y: 55, fontSize: 1.5, fontWeight: "bold", color: "#111111", align: "center", width: 70 },
             { text: "has successfully participated in {{event}}", x: 50, y: 68, fontSize: 0.6, fontWeight: "normal", color: "#666666", align: "center", width: 70 },
-            { text: "held on {{date}}", x: 50, y: 75, fontSize: 0.5, fontWeight: "normal", color: "#999999", align: "center", width: 40 }
+            { text: "held on {{eventDate}}", x: 50, y: 75, fontSize: 0.5, fontWeight: "normal", color: "#999999", align: "center", width: 40 }
         ];
     });
     const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
