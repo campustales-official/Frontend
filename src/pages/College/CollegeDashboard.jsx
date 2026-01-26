@@ -15,7 +15,7 @@ import CreatePostModal from "../../components/clubs/CreatePostModal";
 import CreateAnnouncementModal from "../../components/clubs/CreateAnnouncementModal";
 import EditPostModal from "../../components/clubs/EditPostModal";
 
-import { Globe, Mail, Image as ImageIcon, Calendar as CalendarIcon, Plus, User, Loader2, MapPin, Instagram, Twitter, Linkedin, Facebook } from "lucide-react";
+import { Globe, Mail, Image as ImageIcon, Calendar as CalendarIcon, Plus, User, Loader2, MapPin, Instagram, Twitter, Linkedin, Facebook, X, Filter, ChevronDown, Check } from "lucide-react";
 
 export default function CollegeDashboard() {
     const navigate = useNavigate();
@@ -39,8 +39,11 @@ export default function CollegeDashboard() {
     const isCollegeAdmin = me?.roleInCollege === "college_admin";
 
     const feedTypes = activeTab === "posts" ? "post" : activeTab === "events" ? "event" : "announcement";
+    // Determine enabled state for feed
+    const isFeedEnabled = !!collegeId;
 
     const [eventFilter, setEventFilter] = useState("all");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const {
         data: feedData,
@@ -122,27 +125,25 @@ export default function CollegeDashboard() {
     return (
         <div className="min-h-screen bg-gray-200 pb-20">
             <div className="border-b shadow-sm mb-4 bg-gray-50">
-                <div className="h-48 md:h-64 bg-gray-200 relative">
+                <div className="w-full aspect-[4/1] min-h-[150px] max-h-[400px] bg-gray-200 relative">
                     <img
                         src={college.coverImageUrl}
                         alt="Cover"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-fill"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 relative pb-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-end -mt-12 md:-mt-16 gap-4 md:gap-6 mb-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 relative pb-2">
+                    <div className="flex flex-col md:flex-row items-start -mt-12 md:-mt-16 gap-4 md:gap-6 mb-2">
                         <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl border-4 border-white bg-white shadow-xl overflow-hidden relative z-10">
                             <img src={college.logoUrl} alt={college.name} className="w-full h-full object-cover" />
                         </div>
 
-                        <div className="flex-1 pt-2 md:pt-0 text-center md:text-left">
+                        <div className="flex-1 pt-0 md:mt-16 text-left relative z-0">
                             <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight flex items-center justify-center md:justify-start gap-3">
                                 {college.name}
-                                <span className="bg-indigo-100 text-indigo-700 text-[10px] uppercase font-black px-2.5 py-1 rounded-lg tracking-widest">
-                                    Institute
-                                </span>
+
                             </h1>
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-gray-500 font-bold mt-2">
                                 <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-gray-400" /> {college.city}, {college.state}</span>
@@ -151,11 +152,12 @@ export default function CollegeDashboard() {
                         </div>
                     </div>
 
+                    <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium mt-4">
+                        {college.address}
+                    </p>
+
                     <div className="flex flex-col md:flex-row gap-8">
-                        <div className="flex-1">
-                            <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium">
-                                {college.address}
-                            </p>
+                        <div className="flex-1 p-1">
 
                             <div className="flex flex-wrap gap-4">
                                 {college.emailDomains?.map(domain => (
@@ -168,32 +170,32 @@ export default function CollegeDashboard() {
                             {/* Social Links */}
                             <div className="flex items-center gap-4 mt-6">
                                 {(college.socialLinks?.website || college.website) && (
-                                    <a href={college.socialLinks?.website || college.website} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-blue-600 transition" title="Website">
+                                    <a href={college.socialLinks.website} target="_blank" rel="noreferrer" className="text-blue-400 hover:scale-110 transition" title="Website">
                                         <Globe className="w-5 h-5" />
                                     </a>
                                 )}
                                 {college.socialLinks?.instagram && (
-                                    <a href={college.socialLinks.instagram} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-pink-600 transition" title="Instagram">
+                                    <a href={college.socialLinks.instagram} target="_blank" rel="noreferrer" className="text-pink-600 hover:scale-110 transition" title="Instagram">
                                         <Instagram className="w-5 h-5" />
                                     </a>
                                 )}
                                 {college.socialLinks?.twitter && (
-                                    <a href={college.socialLinks.twitter} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-sky-500 transition" title="X">
-                                        <Twitter className="w-5 h-5" />
+                                    <a href={college.socialLinks.twitter} target="_blank" rel="noreferrer" className="text-black hover:scale-110 transition" title="X">
+                                        <X className="w-5 h-5" />
                                     </a>
                                 )}
                                 {college.socialLinks?.linkedin && (
-                                    <a href={college.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-blue-700 transition" title="LinkedIn">
+                                    <a href={college.socialLinks.linkedin} target="_blank" rel="noreferrer" className="text-blue-800 hover:scale-110 transition" title="LinkedIn">
                                         <Linkedin className="w-5 h-5" />
                                     </a>
                                 )}
                                 {college.socialLinks?.facebook && (
-                                    <a href={college.socialLinks.facebook} target="_blank" rel="noreferrer" className="text-gray-400 hover:scale-110 text-blue-600 transition" title="Facebook">
+                                    <a href={college.socialLinks.facebook} target="_blank" rel="noreferrer" className="text-blue-600 hover:scale-110 transition" title="Facebook">
                                         <Facebook className="w-5 h-5" />
                                     </a>
                                 )}
                                 {(college.socialLinks?.email || college.email) && (
-                                    <a href={`mailto:${college.socialLinks?.email || college.email}`} className="text-gray-400 hover:scale-110 text-orange-500 transition" title="Email">
+                                    <a href={`mailto:${college.socialLinks.email}`} className="text-orange-500 hover:scale-110 transition" title="Contact Email">
                                         <Mail className="w-5 h-5" />
                                     </a>
                                 )}
@@ -284,19 +286,32 @@ export default function CollegeDashboard() {
 
                     {isCollegeAdmin && activeTab === 'events' && (
                         <div className="flex items-center justify-end mb-6">
-                            <div className="bg-white border border-gray-200 p-1 rounded-xl flex items-center gap-1 shadow-sm overflow-x-auto max-w-full">
-                                {["all", "published", "draft", "completed", "cancelled"].map((status) => (
-                                    <button
-                                        key={status}
-                                        onClick={() => setEventFilter(status)}
-                                        className={`px-4 py-2 rounded-lg text-xs font-black capitalize transition-all whitespace-nowrap ${eventFilter === status
-                                            ? "bg-gray-900 text-white shadow-lg shadow-gray-200"
-                                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                                            }`}
-                                    >
-                                        {status}
-                                    </button>
-                                ))}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                    onBlur={() => setTimeout(() => setIsFilterOpen(false), 200)}
+                                    className="flex items-center gap-2 pl-3 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:border-indigo-500 transition shadow-sm hover:bg-gray-50 capitalize"
+                                >
+                                    <Filter className="w-3.5 h-3.5 text-gray-500" />
+                                    <span>{eventFilter} Events</span>
+                                    <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                                </button>
+
+                                {isFilterOpen && (
+                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-100">
+                                        {["all", "published", "draft", "completed", "cancelled"].map((status) => (
+                                            <button
+                                                key={status}
+                                                onClick={() => { setEventFilter(status); setIsFilterOpen(false); }}
+                                                className={`w-full text-left px-4 py-2.5 text-xs font-bold capitalize transition-colors flex items-center justify-between ${eventFilter === status ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                {status}
+                                                {eventFilter === status && <Check className="w-3 h-3" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

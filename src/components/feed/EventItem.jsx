@@ -36,11 +36,11 @@ export default function EventItem({ item, actions, showManageButton = false }) {
             className={`overflow-hidden rounded-xl shadow-sm transition duration-200 flex flex-col sm:flex-row relative group ${containerClasses}`}
         >
             {/* Left Image Section */}
-            <div className="relative w-full sm:w-2/5 h-48 sm:h-auto bg-gray-100">
+            <div className="relative w-full sm:w-2/5 aspect-video sm:aspect-auto sm:h-auto bg-gray-100">
                 <img
                     src={data.bannerImageUrl}
                     alt={data.title}
-                    className={`w-full h-full object-cover ${isImageGrayscale}`}
+                    className={`w-full h-full object-fill ${isImageGrayscale}`}
                 />
                 <div className={`absolute top-3 left-3 backdrop-blur text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm capitalize ${badgeClasses}`}>
                     {normalizedStatus === 'published' && <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>}

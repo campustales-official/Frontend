@@ -24,6 +24,21 @@ export default function ForgotPasswordPage() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [passwordCriteria, setPasswordCriteria] = useState({
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false
+    });
+
+    const checkStrength = (pass) => {
+        setPasswordCriteria({
+            length: pass.length >= 8,
+            uppercase: /[A-Z]/.test(pass),
+            lowercase: /[a-z]/.test(pass),
+            number: /[0-9]/.test(pass)
+        });
+    };
 
     const inputsRef = useRef([]);
     const loginImage = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop";
@@ -201,7 +216,10 @@ export default function ForgotPasswordPage() {
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        onChange={(e) => {
+                                            setNewPassword(e.target.value);
+                                            checkStrength(e.target.value);
+                                        }}
                                         className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                                         placeholder="••••••••"
                                     />
@@ -213,6 +231,26 @@ export default function ForgotPasswordPage() {
                                     >
                                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
+                                </div>
+                                {/* Password Strength Indicators */}
+                                <div className="mt-2 space-y-1">
+                                    <p className="text-xs text-gray-500 font-medium mb-1">Password must contain:</p>
+                                    <div className={`text-xs flex items-center gap-1 ${passwordCriteria.length ? "text-green-600" : "text-gray-400"}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.length ? "bg-green-600" : "bg-gray-300"}`}></div>
+                                        At least 8 characters
+                                    </div>
+                                    <div className={`text-xs flex items-center gap-1 ${passwordCriteria.uppercase ? "text-green-600" : "text-gray-400"}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.uppercase ? "bg-green-600" : "bg-gray-300"}`}></div>
+                                        One uppercase letter
+                                    </div>
+                                    <div className={`text-xs flex items-center gap-1 ${passwordCriteria.lowercase ? "text-green-600" : "text-gray-400"}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.lowercase ? "bg-green-600" : "bg-gray-300"}`}></div>
+                                        One lowercase letter
+                                    </div>
+                                    <div className={`text-xs flex items-center gap-1 ${passwordCriteria.number ? "text-green-600" : "text-gray-400"}`}>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.number ? "bg-green-600" : "bg-gray-300"}`}></div>
+                                        One number
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -234,7 +272,7 @@ export default function ForgotPasswordPage() {
                             )}
 
                             <button
-                                disabled={!newPassword || newPassword !== confirmPassword || resetPasswordMutation.isPending}
+                                disabled={!newPassword || newPassword !== confirmPassword || resetPasswordMutation.isPending || !Object.values(passwordCriteria).every(Boolean)}
                                 onClick={() => resetPasswordMutation.mutate()}
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2"
                             >

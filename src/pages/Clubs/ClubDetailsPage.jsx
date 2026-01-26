@@ -18,7 +18,7 @@ import CreateAnnouncementModal from "../../components/clubs/CreateAnnouncementMo
 
 import { updateClubPost, deleteClubPost, deleteClubAnnouncement, joinClub, leaveClub } from "../../api/clubs.api";
 import EditPostModal from "../../components/clubs/EditPostModal";
-import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Facebook, Linkedin, Plus, Clock, User, UserPlus, CheckCircle, Loader2, Pencil, LogOut } from "lucide-react";
+import { Users, Settings, Globe, Instagram, Mail, Image as ImageIcon, Calendar as CalendarIcon, Send, Twitter, Facebook, Linkedin, Plus, Clock, User, UserPlus, CheckCircle, Loader2, Pencil, LogOut, Filter, ChevronDown, Check } from "lucide-react";
 
 export default function ClubDetailsPage() {
     const { clubId } = useParams();
@@ -87,6 +87,7 @@ export default function ClubDetailsPage() {
     const isFeedEnabled = !!clubId && !!collegeId;
 
     const [eventFilter, setEventFilter] = useState("all");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const {
         data: feedData,
@@ -195,11 +196,11 @@ export default function ClubDetailsPage() {
             {/* Header Section */}
             <div className=" border-b shadow-sm mb-4 bg-gray-50">
                 {/* Cover Banner */}
-                <div className="h-48 md:h-64 bg-gray-200 relative">
+                <div className="w-full aspect-[4/1] min-h-[150px] max-h-[400px] bg-gray-200 relative">
                     <img
                         src={club.coverImageUrl}
                         alt="Cover"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-fill"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                 </div>
@@ -415,19 +416,32 @@ export default function ClubDetailsPage() {
                     {/* Admin Event Filter */}
                     {isAdmin && activeTab === 'events' && (
                         <div className="flex items-center justify-end mb-4">
-                            <div className="bg-white border border-gray-200 p-1 rounded-lg flex items-center gap-1 shadow-sm overflow-x-auto max-w-full">
-                                {["all", "published", "draft", "completed", "cancelled"].map((status) => (
-                                    <button
-                                        key={status}
-                                        onClick={() => setEventFilter(status)}
-                                        className={`px-3 py-1.5 rounded-md text-xs font-bold capitalize transition-all whitespace-nowrap ${eventFilter === status
-                                            ? "bg-gray-900 text-white shadow-sm"
-                                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                                            }`}
-                                    >
-                                        {status}
-                                    </button>
-                                ))}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                    onBlur={() => setTimeout(() => setIsFilterOpen(false), 200)}
+                                    className="flex items-center gap-2 pl-3 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:border-blue-500 transition shadow-sm hover:bg-gray-50 capitalize"
+                                >
+                                    <Filter className="w-3.5 h-3.5 text-gray-500" />
+                                    <span>{eventFilter} Events</span>
+                                    <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                                </button>
+
+                                {isFilterOpen && (
+                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-100">
+                                        {["all", "published", "draft", "completed", "cancelled"].map((status) => (
+                                            <button
+                                                key={status}
+                                                onClick={() => { setEventFilter(status); setIsFilterOpen(false); }}
+                                                className={`w-full text-left px-4 py-2.5 text-xs font-bold capitalize transition-colors flex items-center justify-between ${eventFilter === status ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                {status}
+                                                {eventFilter === status && <Check className="w-3 h-3" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

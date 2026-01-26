@@ -21,7 +21,6 @@ import {
     Instagram,
     Hash,
     Trash2,
-    RefreshCw,
     ShieldCheck
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +29,7 @@ import { toast } from "react-toastify";
 // Helper Component for Identifier Configuration
 function IdentifierConfigSection({ title, type, config, setConfig }) {
     const [newType, setNewType] = useState("");
-    const [exampleValue, setExampleValue] = useState("");
+
 
     const handleAddType = () => {
         if (!newType) return;
@@ -67,29 +66,7 @@ function IdentifierConfigSection({ title, type, config, setConfig }) {
         }));
     };
 
-    const handleGenerateRegex = () => {
-        if (!exampleValue) return;
 
-        // Simple heuristic regex generation
-        let regex = "^" + exampleValue
-            .replace(/[0-9]+/g, "\\d+")
-            .replace(/[a-zA-Z]+/g, "[A-Z]+")
-            .replace(/-/g, "-") + "$";
-
-        // Refine common patterns
-        if (exampleValue.match(/^[A-Z]+\d{5}$/)) { // e.g. NCE12345
-            const prefix = exampleValue.match(/^[A-Z]+/)[0];
-            const digits = exampleValue.match(/\d{5}$/)[0].length;
-            regex = `^${prefix}[0-9]{${digits}}$`;
-        } else if (exampleValue.match(/^\d+$/)) { // e.g. 123456
-            regex = `^[0-9]{${exampleValue.length}}$`;
-        }
-
-        setConfig(prev => ({
-            ...prev,
-            [type]: { ...prev[type], regex }
-        }));
-    };
 
     return (
         <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
@@ -140,38 +117,10 @@ function IdentifierConfigSection({ title, type, config, setConfig }) {
                         ))}
                     </select>
                 </div>
-                <div>
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Regex Pattern</label>
-                    <input
-                        type="text"
-                        value={config.regex}
-                        onChange={(e) => setConfig(prev => ({ ...prev, [type]: { ...prev[type], regex: e.target.value } }))}
-                        className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-indigo-500 font-mono text-xs"
-                    />
-                </div>
+
             </div>
 
-            {/* Regex Generator */}
-            <div className="bg-white p-3 rounded-xl border border-dashed border-gray-200">
-                <label className="text-xs text-gray-400 mb-1 block">Auto-generate Regex from Example</label>
-                <div className="flex gap-2">
-                    <input
-                        type="text"
-                        value={exampleValue}
-                        onChange={(e) => setExampleValue(e.target.value)}
-                        placeholder="e.g. NCE12345"
-                        className="flex-1 px-3 py-1.5 rounded-lg border border-gray-100 text-sm focus:outline-none focus:border-indigo-500"
-                    />
-                    <button
-                        type="button"
-                        onClick={handleGenerateRegex}
-                        className="flex items-center gap-1.5 bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors"
-                    >
-                        <RefreshCw className="w-3 h-3" />
-                        Generate
-                    </button>
-                </div>
-            </div>
+
         </div>
     );
 }
@@ -281,7 +230,13 @@ export default function RegisterCollege() {
         if (files.coverImage) data.append("coverImage", files.coverImage);
 
         // Append Config
-        data.append("identifierConfig", JSON.stringify(identifierConfig));
+        const sanitizedConfig = Object.fromEntries(
+            Object.entries(identifierConfig).map(([k, v]) => {
+                const { regex, ...rest } = v;
+                return [k, rest];
+            })
+        );
+        data.append("identifierConfig", JSON.stringify(sanitizedConfig));
 
         mutation.mutate(data);
     };
@@ -350,13 +305,13 @@ export default function RegisterCollege() {
                                 <div className="space-y-4">
                                     <label className="text-xs font-black text-gray-500 uppercase tracking-wider">Cover Image</label>
                                     <div className="relative group">
-                                        <div className={`aspect-video rounded-3xl border-4 border-dashed transition-all flex flex-col items-center justify-center p-4 ${coverPreview ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 bg-gray-50'}`}>
+                                        <div className={`aspect-[4/1] rounded-3xl border-4 border-dashed transition-all flex flex-col items-center justify-center p-4 ${coverPreview ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 bg-gray-50'}`}>
                                             {coverPreview ? (
                                                 <img src={coverPreview} className="w-full h-full object-cover rounded-2xl" alt="Preview" />
                                             ) : (
                                                 <>
                                                     <Upload className="w-10 h-10 text-gray-300 group-hover:text-indigo-400 mb-2" />
-                                                    <p className="text-xs text-gray-400 font-bold">16:9 Aspect Ratio preferred</p>
+                                                    <p className="text-xs text-gray-400 font-bold">4:1 Aspect Ratio (e.g. 1600×400)</p>
                                                 </>
                                             )}
                                             <input

@@ -206,7 +206,7 @@ export default function EditClubPage() {
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-3">Cover Image</label>
                             <div
-                                className="relative h-48 w-full rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center cursor-pointer group overflow-hidden"
+                                className="relative aspect-[4/1] h-auto w-full rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center cursor-pointer group overflow-hidden"
                                 onClick={() => document.getElementById('coverInput').click()}
                             >
                                 {coverPreview ? (
@@ -215,6 +215,7 @@ export default function EditClubPage() {
                                     <div className="text-center">
                                         <div className="bg-white p-3 rounded-full shadow-sm mb-2 inline-block"><Upload className="w-5 h-5 text-gray-400" /></div>
                                         <p className="text-sm text-gray-500 font-medium">Click to upload cover image</p>
+                                        <p className="text-xs text-gray-400 mt-1">4:1 aspect ratio (e.g. 1600×400)</p>
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">

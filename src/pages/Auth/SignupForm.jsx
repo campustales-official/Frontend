@@ -12,6 +12,22 @@ export default function SignupForm() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false
+  });
+
+  const checkStrength = (pass) => {
+    setPasswordCriteria({
+      length: pass.length >= 8,
+      uppercase: /[A-Z]/.test(pass),
+      lowercase: /[a-z]/.test(pass),
+      number: /[0-9]/.test(pass)
+    });
+  };
   const [agreeTerms, setAgreeTerms] = useState(false);
 
   const { data: colleges } = useCollegeSearch(query);
@@ -145,6 +161,11 @@ export default function SignupForm() {
             required
             placeholder="Create a strong password"
             className={inputClass + " pr-12"}
+            onChange={(e) => {
+              const val = e.target.value;
+              setPassword(val);
+              checkStrength(val);
+            }}
           />
           <button
             type="button"
@@ -153,6 +174,26 @@ export default function SignupForm() {
           >
             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
+        </div>
+        {/* Password Strength Indicators */}
+        <div className="mt-2 space-y-1">
+          <p className="text-xs text-gray-500 font-medium mb-1">Password must contain:</p>
+          <div className={`text-xs flex items-center gap-1 ${passwordCriteria.length ? "text-green-600" : "text-gray-400"}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.length ? "bg-green-600" : "bg-gray-300"}`}></div>
+            At least 8 characters
+          </div>
+          <div className={`text-xs flex items-center gap-1 ${passwordCriteria.uppercase ? "text-green-600" : "text-gray-400"}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.uppercase ? "bg-green-600" : "bg-gray-300"}`}></div>
+            One uppercase letter
+          </div>
+          <div className={`text-xs flex items-center gap-1 ${passwordCriteria.lowercase ? "text-green-600" : "text-gray-400"}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.lowercase ? "bg-green-600" : "bg-gray-300"}`}></div>
+            One lowercase letter
+          </div>
+          <div className={`text-xs flex items-center gap-1 ${passwordCriteria.number ? "text-green-600" : "text-gray-400"}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${passwordCriteria.number ? "bg-green-600" : "bg-gray-300"}`}></div>
+            One number
+          </div>
         </div>
       </div>
 
@@ -286,7 +327,7 @@ export default function SignupForm() {
       {/* Submit */}
       <button
         type="submit"
-        disabled={isPending || !agreeTerms}
+        disabled={isPending || !agreeTerms || !Object.values(passwordCriteria).every(Boolean)}
         className="w-full bg-blue-600 text-white rounded-lg py-3 text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isPending ? "Creating Account..." : "Create Account"}

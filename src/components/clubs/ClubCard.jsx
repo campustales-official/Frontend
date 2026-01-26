@@ -71,11 +71,11 @@ export default function ClubCard({ club, isAdmin = false, showPendingActions = f
             )}
 
             {/* Cover Image */}
-            <div className="h-32 bg-gray-200 relative">
+            <div className="aspect-[3/1] bg-gray-200 relative">
                 <img
                     src={club.coverImageUrl}
                     alt="Cover"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-fill"
                 />
             </div>
 
