@@ -11,6 +11,7 @@ import AuthPage from "./pages/Auth/AuthPage";
 import VerifyEmailOtpPage from "./pages/Auth/VerifyEmailOtpPage";
 import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
 import FeedPage from "./pages/Feed/FeedPage";
+import ScrollToTop from "./components/common/ScrollToTop";
 import AnnouncementsPage from "./pages/Feed/AnnouncementsPage";
 import ClubsPage from "./pages/Clubs/ClubsPage";
 import CollegeDashboard from "./pages/College/CollegeDashboard";
@@ -59,11 +60,12 @@ function GuardedRoutes() {
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="*" element={<Navigate to="/login" state={{ from: location }} replace />} />
         </Routes>
       );
     }
-    // Redirect everything else to login
-    return <Navigate to="/login" replace />;
+    // Redirect everything else to login with from state
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // ✅ Logged in - redirect away from public auth pages
@@ -73,7 +75,8 @@ function GuardedRoutes() {
     if (me.platformRole === 'superadmin') {
       return <Navigate to="/admin" replace />;
     }
-    return <Navigate to="/" replace />;
+    const origin = location.state?.from?.pathname || "/";
+    return <Navigate to={origin} replace />;
   }
 
   // 📧 Logged in but not verified
@@ -156,6 +159,7 @@ function GuardedRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <GuardedRoutes />
     </BrowserRouter>
   );

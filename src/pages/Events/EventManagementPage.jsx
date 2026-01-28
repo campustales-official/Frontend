@@ -14,6 +14,7 @@ import {
     getEventDetails, publishEvent, closeRegistration, completeEvent,
     deleteEvent, getEventRegistrations, downloadRegistrationsExcel, generateBulkCertificates, generateCertificate
 } from "../../api/events.api";
+import { formatSafeDate } from "../../utils/date.utils";
 
 export default function EventManagementPage() {
     const navigate = useNavigate();
@@ -133,7 +134,7 @@ export default function EventManagementPage() {
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Event Lifecycle Management</p>
                         </div>
                     </div>
-                    {event.status === "draft" && (
+                    {event.status !== "completed" && (
                         <Link to={`/events/${eventId}/edit`} className="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-gray-800 transition">
                             <Edit3 className="w-4 h-4" /> Edit Event
                         </Link>
@@ -160,10 +161,10 @@ export default function EventManagementPage() {
                                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${statusColors[event.status]}`}>
                                     {event.status.replace("_", " ")}
                                 </span>
-                                <span className="text-xs text-gray-400 font-bold">Created {new Date(event.createdAt).toLocaleDateString()}</span>
+                                <span className="text-xs text-gray-400 font-bold">Created {formatSafeDate(event.createdAt, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                             </div>
                             <h2 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">{event.title}</h2>
-                            <p className="text-sm text-gray-500 line-clamp-2">{event.description}</p>
+                            <p className="text-sm text-gray-500 line-clamp-2">{event.description || "To be announced"}</p>
 
                             <div className="flex items-center gap-2 text-sm font-bold text-gray-600 mt-1">
                                 <span className="text-gray-400 uppercase text-[10px] tracking-widest">Organized by</span>
@@ -179,11 +180,11 @@ export default function EventManagementPage() {
                                     <div className="pl-6 space-y-1">
                                         <div className="flex justify-between text-xs">
                                             <span className="text-gray-500">Starts</span>
-                                            <span className="font-semibold">{new Date(event.eventStartAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span className="font-semibold">{formatSafeDate(event.eventStartAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                         <div className="flex justify-between text-xs">
                                             <span className="text-gray-500">Ends</span>
-                                            <span className="font-semibold">{new Date(event.eventEndAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span className="font-semibold">{formatSafeDate(event.eventEndAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -196,11 +197,11 @@ export default function EventManagementPage() {
                                     <div className="pl-6 space-y-1">
                                         <div className="flex justify-between text-xs">
                                             <span className="text-gray-500">Opens</span>
-                                            <span className="font-semibold">{new Date(event.registrationStartAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span className="font-semibold">{formatSafeDate(event.registrationStartAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                         <div className="flex justify-between text-xs">
                                             <span className="text-gray-500">Closes</span>
-                                            <span className="font-semibold">{new Date(event.registrationEndAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span className="font-semibold">{formatSafeDate(event.registrationEndAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -210,7 +211,7 @@ export default function EventManagementPage() {
                                     <div className="flex items-center gap-2 text-gray-900 font-bold">
                                         <MapPin className="w-4 h-4 text-red-600" /> Location
                                     </div>
-                                    <p className="pl-6 text-sm text-gray-600">{event.venue}</p>
+                                    <p className="pl-6 text-sm text-gray-600 font-medium">{event.venue || "To be announced"}</p>
                                 </div>
                             </div>
                         </div>

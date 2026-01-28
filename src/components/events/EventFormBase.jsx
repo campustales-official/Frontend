@@ -246,7 +246,7 @@ export default function EventFormBase({
                                     <div className="relative">
                                         <MapPin className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
                                         <input
-                                            type="text" name="venue" value={formData.venue} onChange={handleChange} required
+                                            type="text" name="venue" value={formData.venue} onChange={handleChange}
                                             placeholder="e.g. Grand Auditorium, Block C"
                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition"
                                         />
@@ -284,14 +284,14 @@ export default function EventFormBase({
                                     <div>
                                         <label className="block text-xs font-semibold text-gray-500 mb-1">Starts</label>
                                         <input
-                                            type="datetime-local" name="eventStartAt" value={formData.eventStartAt} onChange={handleChange} required
+                                            type="datetime-local" name="eventStartAt" value={formData.eventStartAt} onChange={handleChange}
                                             className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition"
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-gray-500 mb-1">Ends</label>
                                         <input
-                                            type="datetime-local" name="eventEndAt" value={formData.eventEndAt} onChange={handleChange} required
+                                            type="datetime-local" name="eventEndAt" value={formData.eventEndAt} onChange={handleChange}
                                             className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition"
                                         />
                                     </div>

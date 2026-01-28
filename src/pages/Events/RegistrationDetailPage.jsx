@@ -10,6 +10,7 @@ import { useMe } from "../../hooks/useMe";
 import { getRegistrationDetails, getEventDetails, generateCertificate } from "../../api/events.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Award, Zap } from "lucide-react";
+import { formatSafeDateOnly } from "../../utils/date.utils";
 
 export default function RegistrationDetailPage() {
     const navigate = useNavigate();
@@ -165,7 +166,7 @@ export default function RegistrationDetailPage() {
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Registered On</p>
-                                        <p className="text-sm font-bold text-gray-900">{new Date(reg.registeredAt).toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                        <p className="text-sm font-bold text-gray-900">{formatSafeDateOnly(reg.registeredAt)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 text-left">

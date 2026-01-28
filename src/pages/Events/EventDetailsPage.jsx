@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getEventDetails } from "../../api/events.api";
 import { Calendar, MapPin, Clock, Share2, User, Info, ArrowRight, Loader2, ArrowLeft } from "lucide-react";
+import { formatSafeDate } from "../../utils/date.utils";
 import { useMe } from "../../hooks/useMe";
 import { toast } from "react-toastify";
 
@@ -53,7 +54,7 @@ export default function EventDetailsPage() {
     if (now < regStart) {
         isDisabled = true;
         buttonText = "Registration Not Open";
-        buttonSubtext = `Starts ${regStart.toLocaleDateString([], { month: 'short', day: 'numeric' })} ${regStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        buttonSubtext = `Starts ${formatSafeDate(event.registrationStartAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
     } else if (now > regEnd) {
         isDisabled = true;
         buttonText = "Registration Closed";
@@ -128,19 +129,19 @@ export default function EventDetailsPage() {
                                     <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                                         <Calendar className="w-5 h-5" />
                                     </div>
-                                    <span className="text-lg">{eventStart.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                                    <span className="text-lg">{formatSafeDate(event.eventStartAt, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                                 </div>
                                 <div className="flex items-center gap-2.5">
                                     <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                                         <Clock className="w-5 h-5" />
                                     </div>
-                                    <span className="text-lg">{eventStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    <span className="text-lg">{formatSafeDate(event.eventStartAt, { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
                                 <div className="flex items-center gap-2.5">
                                     <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                                         <MapPin className="w-5 h-5" />
                                     </div>
-                                    <span className="text-lg">{event.venue}</span>
+                                    <span className="text-lg font-medium">{event.venue || "To be announced"}</span>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +153,7 @@ export default function EventDetailsPage() {
                                 About Event
                             </h2>
                             <div className="prose prose-lg text-gray-600 leading-relaxed whitespace-pre-wrap max-w-none">
-                                {event.description}
+                                {event.description || "To be announced"}
                             </div>
                         </div>
 
@@ -181,10 +182,7 @@ export default function EventDetailsPage() {
                                 <div>
                                     <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Registration By</div>
                                     <div className="font-bold text-gray-900 text-lg leading-tight">
-                                        {regEnd.toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                                        <span className="text-sm text-gray-500 font-medium ml-1">
-                                            {regEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
+                                        {formatSafeDate(event.registrationEndAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
                             </div>

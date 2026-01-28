@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, ArrowRight, Settings, FileText, Download, Award } from "lucide-react";
 import { getCertificateDownloadUrl } from "../../api/events.api";
+import { formatSafeDate } from "../../utils/date.utils";
 
 export default function EventItem({ item, actions, showManageButton = false }) {
     const { data, college, club, id, showExploreButton = true } = item;
@@ -78,17 +79,17 @@ export default function EventItem({ item, actions, showManageButton = false }) {
                 </div>
 
                 <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">{data.title}</h3>
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{data.description}</p>
+                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{data.description || "To be announced"}</p>
 
                 {/* Details */}
                 <div className="space-y-2 mb-6">
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Calendar className="w-4 h-4 text-blue-500" />
-                        <span>{new Date(data.eventStartAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                        <span>{formatSafeDate(data.eventStartAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                         <MapPin className="w-4 h-4 text-blue-500" />
-                        <span>{data.venue}</span>
+                        <span className=" font-medium">{data.venue || "To be announced"}</span>
                     </div>
                 </div>
 
