@@ -171,9 +171,6 @@ export default function PostItem({ item, actions }) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <span className="bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">
-                        Post
-                    </span>
                     {actions && (
                         <ActionMenu onEdit={actions.onEdit} onDelete={actions.onDelete} />
                     )}

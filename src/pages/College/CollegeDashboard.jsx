@@ -302,7 +302,11 @@ export default function CollegeDashboard() {
                                         {["all", "published", "draft", "completed", "cancelled"].map((status) => (
                                             <button
                                                 key={status}
-                                                onClick={() => { setEventFilter(status); setIsFilterOpen(false); }}
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    setEventFilter(status);
+                                                    setIsFilterOpen(false);
+                                                }}
                                                 className={`w-full text-left px-4 py-2.5 text-xs font-bold capitalize transition-colors flex items-center justify-between ${eventFilter === status ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'
                                                     }`}
                                             >

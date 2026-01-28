@@ -16,6 +16,7 @@ export default function VerifyEmailOtpPage() {
   const email = me?.email;
 
   const [otp, setOtp] = useState(Array(6).fill(""));
+  const [countdown, setCountdown] = useState(120);
   const inputsRef = useRef([]);
 
   /* ---------- Send OTP ---------- */
@@ -23,6 +24,7 @@ export default function VerifyEmailOtpPage() {
     mutationFn: () => sendVerifyEmailOtp(email),
     onSuccess: () => {
       toast.success("Verification code sent to your email");
+      setCountdown(120);
     },
     onError: (err) => {
       toast.error(
@@ -70,16 +72,23 @@ export default function VerifyEmailOtpPage() {
 
   const isOtpComplete = otp.every((d) => d !== "");
 
-const hasSentRef = useRef(false);
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
-useEffect(() => {
-  if (!email) return;
+  const hasSentRef = useRef(false);
 
-  if (!hasSentRef.current) {
-    sendOtpMutation.mutate();
-    hasSentRef.current = true;
-  }
-}, [email]);
+  useEffect(() => {
+    if (!email) return;
+
+    if (!hasSentRef.current) {
+      sendOtpMutation.mutate();
+      hasSentRef.current = true;
+    }
+  }, [email]);
 
 
   return (
@@ -133,13 +142,19 @@ useEffect(() => {
             {/* Resend */}
             <p className="text-sm text-gray-500 text-center">
               Didn’t receive the code?{" "}
-              <button
-                onClick={() => sendOtpMutation.mutate()}
-                disabled={sendOtpMutation.isPending}
-                className="text-blue-600 hover:underline disabled:opacity-50"
-              >
-                Resend code
-              </button>
+              {countdown > 0 ? (
+                <span className="text-gray-400 font-medium ml-1">
+                  Resend in {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+                </span>
+              ) : (
+                <button
+                  onClick={() => sendOtpMutation.mutate()}
+                  disabled={sendOtpMutation.isPending}
+                  className="text-blue-600 hover:underline disabled:opacity-50 font-medium"
+                >
+                  Resend code
+                </button>
+              )}
             </p>
 
             {/* Footer */}

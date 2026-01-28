@@ -24,6 +24,7 @@ export default function ForgotPasswordPage() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [countdown, setCountdown] = useState(0);
     const [passwordCriteria, setPasswordCriteria] = useState({
         length: false,
         uppercase: false,
@@ -49,6 +50,7 @@ export default function ForgotPasswordPage() {
         onSuccess: () => {
             toast.success("Password reset code sent to your email");
             setStep(STEPS.VERIFY);
+            setCountdown(120);
         },
         onError: (err) => {
             toast.error(err?.response?.data?.message || "Failed to send reset code");
@@ -96,6 +98,13 @@ export default function ForgotPasswordPage() {
     };
 
     const isOtpComplete = otp.every((d) => d !== "");
+
+    useEffect(() => {
+        if (countdown > 0) {
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [countdown]);
 
     /* ---------- Render Helpers ---------- */
     const renderLeftContent = () => {
@@ -179,13 +188,19 @@ export default function ForgotPasswordPage() {
                                 Verify Code
                             </button>
                             <div className="text-center">
-                                <button
-                                    onClick={() => requestOtpMutation.mutate()}
-                                    disabled={requestOtpMutation.isPending}
-                                    className="text-sm text-blue-600 font-semibold hover:underline disabled:opacity-50"
-                                >
-                                    Resend Code
-                                </button>
+                                {countdown > 0 ? (
+                                    <span className="text-sm text-gray-400 font-medium">
+                                        Resend code in {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+                                    </span>
+                                ) : (
+                                    <button
+                                        onClick={() => requestOtpMutation.mutate()}
+                                        disabled={requestOtpMutation.isPending}
+                                        className="text-sm text-blue-600 font-semibold hover:underline disabled:opacity-50"
+                                    >
+                                        Resend Code
+                                    </button>
+                                )}
                             </div>
                             <button
                                 onClick={() => setStep(STEPS.REQUEST)}

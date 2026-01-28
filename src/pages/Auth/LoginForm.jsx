@@ -117,10 +117,6 @@ export default function LoginForm() {
 
       {/* Remember & Forgot */}
       <div className="flex items-center justify-between text-sm">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-          <span className="text-gray-600">Remember me</span>
-        </label>
         <Link to="/forgot-password" title="Forgot password?" className="text-blue-600 font-medium hover:underline">
           Forgot password?
         </Link>

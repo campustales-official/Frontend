@@ -11,7 +11,7 @@ export const fetchFeed = async ({ pageParam = null, queryKey }) => {
   if (clubId) params.clubId = clubId;
   if (pageParam) params.cursor = pageParam;
   if (types) params.types = types;
-  if (eventStatus) params.eventStatus = eventStatus;
+  if (eventStatus && eventStatus !== "all") params.eventStatus = eventStatus;
 
   // Map scope to visibility param if not global
   if (scope) {

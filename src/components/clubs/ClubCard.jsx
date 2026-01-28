@@ -71,7 +71,7 @@ export default function ClubCard({ club, isAdmin = false, showPendingActions = f
             )}
 
             {/* Cover Image */}
-            <div className="aspect-[3/1] bg-gray-200 relative">
+            <div className="aspect-[3/1] bg-gray-200 relative max-h-33">
                 <img
                     src={club.coverImageUrl}
                     alt="Cover"

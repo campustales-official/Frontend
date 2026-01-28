@@ -19,16 +19,36 @@ export default function EventItem({ item, actions, showManageButton = false }) {
         'registration-closed': "bg-orange-50"
     }[normalizedStatus] || "bg-white hover:shadow-md";
 
+    const now = new Date();
+    const regStart = new Date(data.registrationStartAt);
+    const regEnd = new Date(data.registrationEndAt);
+
+    let calculatedStatus = normalizedStatus;
+    if (normalizedStatus === 'published') {
+        if (now < regStart) calculatedStatus = 'upcoming';
+        else if (now >= regStart && now <= regEnd) calculatedStatus = 'open';
+        else calculatedStatus = 'registration-closed';
+    }
+
     // Badge Styling
     const badgeClasses = {
         draft: "bg-gray-200 text-gray-700",
         cancelled: "bg-red-100 text-red-700",
         completed: "bg-green-100 text-green-700",
-        published: "bg-green-50 text-green-700",
+        upcoming: "bg-blue-50 text-blue-700",
+        open: "bg-green-500 text-white",
         'registration-closed': "bg-orange-100 text-orange-700"
-    }[normalizedStatus] || "bg-green-50 text-green-700 pb-0.5";
+    }[calculatedStatus] || "bg-green-50 text-green-700 pb-0.5";
 
-    const badgeText = normalizedStatus === 'published' ? 'Upcoming' : normalizedStatus.replace('-', ' ');
+    const badgeText = {
+        upcoming: "Upcoming",
+        open: "Open Now",
+        'registration-closed': "Registration Closed",
+        draft: "Draft",
+        cancelled: "Cancelled",
+        completed: "Completed"
+    }[calculatedStatus] || calculatedStatus.replace('-', ' ');
+
     const isImageGrayscale = normalizedStatus === 'draft' ? "grayscale" : "";
 
     return (
@@ -42,8 +62,8 @@ export default function EventItem({ item, actions, showManageButton = false }) {
                     alt={data.title}
                     className={`w-full h-full object-fill ${isImageGrayscale}`}
                 />
-                <div className={`absolute top-3 left-3 backdrop-blur text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-sm capitalize ${badgeClasses}`}>
-                    {normalizedStatus === 'published' && <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>}
+                <div className={`absolute top-3 left-3 backdrop-blur text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1 shadow-sm uppercase tracking-wider ${badgeClasses}`}>
+                    {calculatedStatus === 'open' && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>}
                     {badgeText}
                 </div>
             </div>

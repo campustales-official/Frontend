@@ -434,7 +434,12 @@ export default function ClubDetailsPage() {
                                         {["all", "published", "draft", "completed", "cancelled"].map((status) => (
                                             <button
                                                 key={status}
-                                                onClick={() => { setEventFilter(status); setIsFilterOpen(false); }}
+                                                onMouseDown={(e) => {
+                                                    // Use onMouseDown to prevent onBlur from closing the menu before click
+                                                    e.preventDefault();
+                                                    setEventFilter(status);
+                                                    setIsFilterOpen(false);
+                                                }}
                                                 className={`w-full text-left px-4 py-2.5 text-xs font-bold capitalize transition-colors flex items-center justify-between ${eventFilter === status ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
                                                     }`}
                                             >

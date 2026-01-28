@@ -258,8 +258,8 @@ export default function SignupForm() {
               className={inputClass + " appearance-none pr-10"}
             >
               <option value="student">Student</option>
-              <option value="faculty">Faculty</option>
-              <option value="alumni">Alumni</option>
+              {/* <option value="faculty">Faculty</option>
+              <option value="alumni">Alumni</option> */}
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           </div>
