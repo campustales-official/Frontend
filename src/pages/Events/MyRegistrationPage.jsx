@@ -37,7 +37,14 @@ export default function MyRegistrationPage() {
         enabled: !!eventId
     });
 
-    const isRegistrationClosed = (event?.status === 'published' && event?.registrationEndAt) ? new Date(event.registrationEndAt) < new Date() : false;
+    const isRegistrationClosed = (() => {
+        if (!event) return false;
+        if (event.status !== 'published') return true;
+        const now = new Date();
+        const start = event.registrationStartAt ? new Date(event.registrationStartAt) : null;
+        const end = event.registrationEndAt ? new Date(event.registrationEndAt) : null;
+        return (start && now < start) || (end && now > end);
+    })();
 
     const { mutate: handleCancel, isPending: cancelPending } = useMutation({
         mutationFn: () => cancelRegistration(registrationId),

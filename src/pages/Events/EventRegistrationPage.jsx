@@ -54,7 +54,8 @@ export default function EventRegistrationPage() {
                 clubId: event?.club?.id,
                 eventId,
                 answers: formattedAnswers,
-                visibility: event?.visibility
+                visibility: event?.visibility,
+                isExternal: me?.roleInCollege === 'external'
             });
         },
         onSuccess: () => {

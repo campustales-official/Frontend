@@ -26,7 +26,7 @@ export default function EventsPage() {
         collegeId: collegeId,
         types: "event",
         eventStatus: eventStatusParam,
-        enabled: !!collegeId
+        enabled: !!me
     });
 
     const observerRef = useRef(null);

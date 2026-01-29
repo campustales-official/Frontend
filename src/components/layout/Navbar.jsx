@@ -29,6 +29,7 @@ export default function Navbar() {
         mutationFn: logout,
         onSuccess: () => {
             queryClient.clear();
+            localStorage.removeItem("roleInCollege");
             toast.success("Logged out successfully");
             navigate("/login");
         },

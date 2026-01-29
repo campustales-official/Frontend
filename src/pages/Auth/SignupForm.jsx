@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { signup } from "../../api/auth.api";
+import { signup, externalSignup } from "../../api/auth.api";
 import { useCollegeSearch } from "../../hooks/useCollegeSearch";
 import { Eye, EyeOff, Search, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
@@ -10,6 +10,7 @@ export default function SignupForm() {
   const [query, setQuery] = useState("");
   const [college, setCollege] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isExternal, setIsExternal] = useState(false);
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -32,8 +33,11 @@ export default function SignupForm() {
 
   const { data: colleges } = useCollegeSearch(query);
   const { mutate, isPending } = useMutation({
-    mutationFn: signup,
-    onSuccess: () => {
+    mutationFn: (data) => isExternal ? externalSignup(data) : signup(data),
+    onSuccess: (res) => {
+      const role = res.data?.data?.roleInCollege;
+      if (role) localStorage.setItem("roleInCollege", role);
+
       toast.success("Account created successfully! Please check your email to verify.");
       queryClient.invalidateQueries(["me"]);
     },
@@ -58,8 +62,13 @@ export default function SignupForm() {
       toast.error("Please agree to the Terms of Service and Privacy Policy.");
       return;
     }
-    if (!college) {
+    if (!isExternal && !college) {
       toast.error("Please select your college/university.");
+      return;
+    }
+
+    if (isExternal && (!e.target.collegeName.value || !e.target.degree.value || !e.target.branch.value || !e.target.year.value || !e.target.yearOfAdmission.value || !e.target.passingYear.value)) {
+      toast.error("Please fill all mandatory fields.");
       return;
     }
 
@@ -67,18 +76,43 @@ export default function SignupForm() {
     const identifierValue = formData.identifier;
     delete formData.identifier;
 
-    mutate({
-      ...formData,
-      collegeId: college?.id,
-      roleInCollege: role,
+    const academicData = {
+      degree: formData.degree,
+      branch: formData.branch,
       year: formData.year ? parseInt(formData.year) : undefined,
       yearOfAdmission: formData.yearOfAdmission ? parseInt(formData.yearOfAdmission) : undefined,
       passingYear: formData.passingYear ? parseInt(formData.passingYear) : undefined,
-      identifier: {
-        type: getIdentifierType(),
-        value: identifierValue,
-      },
-    });
+    };
+
+    if (isExternal) {
+      mutate({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        collegeName: formData.collegeName,
+        ...academicData,
+        collegeAisheCode: formData.collegeAisheCode || undefined,
+        collegeCity: formData.collegeCity || undefined,
+        collegeState: formData.collegeState || undefined,
+        identifiers: identifierValue ? {
+          student: {
+            type: "roll_no",
+            value: identifierValue
+          }
+        } : undefined
+      });
+    } else {
+      mutate({
+        ...formData,
+        ...academicData,
+        collegeId: college?.id,
+        roleInCollege: role,
+        identifier: {
+          type: getIdentifierType(),
+          value: identifierValue,
+        },
+      });
+    }
   };
 
   // Helper to format identifier type to readable label
@@ -200,39 +234,77 @@ export default function SignupForm() {
         </div>
       </div>
 
-      {/* College Search */}
+      {/* College Search / Manual Entry */}
       <div className="relative">
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">College / University</label>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setShowDropdown(true);
-              setCollege(null);
-            }}
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Search for your college..."
-            className={inputClass + " pl-10"}
-          />
-        </div>
-        {showDropdown && colleges && colleges.length > 0 && (
-          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-auto">
-            {colleges.map((c) => (
-              <div
-                key={c.id}
-                onClick={() => {
-                  setCollege(c);
-                  setQuery(c.name);
-                  setShowDropdown(false);
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          {isExternal ? "College / University Name" : "College / University"}
+        </label>
+        {!isExternal ? (
+          <>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowDropdown(true);
+                  setCollege(null);
                 }}
-                className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm text-gray-700"
-              >
-                <span className="font-medium">{c.name}</span>
-                <span className="text-gray-400 ml-2">— {c.city}</span>
+                onFocus={() => setShowDropdown(true)}
+                placeholder="Search for your college..."
+                className={inputClass + " pl-10"}
+              />
+            </div>
+            {showDropdown && colleges && colleges.length > 0 && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-auto">
+                {colleges.map((c) => (
+                  <div
+                    key={c.id}
+                    onClick={() => {
+                      setCollege(c);
+                      setQuery(c.name);
+                      setShowDropdown(false);
+                    }}
+                    className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm text-gray-700"
+                  >
+                    <span className="font-medium">{c.name}</span>
+                    <span className="text-gray-400 ml-2">— {c.city}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+            <button
+              type="button"
+              onClick={() => setIsExternal(true)}
+              className="mt-2 text-xs text-blue-600 hover:underline font-medium"
+            >
+              Can't find your college? Register manually
+            </button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <input name="collegeName" required placeholder="Enter full college name" className={inputClass} />
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">AISHE Code (Optional)</label>
+                <input name="collegeAisheCode" placeholder="U-123" className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">City (Optional)</label>
+                <input name="collegeCity" placeholder="Bhopal" className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">State (Optional)</label>
+                <input name="collegeState" placeholder="Madhya Pradesh" className={inputClass} />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsExternal(false)}
+              className="text-xs text-blue-600 hover:underline font-medium"
+            >
+              Search from existing colleges
+            </button>
           </div>
         )}
       </div>
@@ -245,7 +317,8 @@ export default function SignupForm() {
           </label>
           <input
             name="identifier"
-            placeholder={getIdentifierPlaceholder()}
+            required
+            placeholder={isExternal ? "e.g. CS123" : getIdentifierPlaceholder()}
             className={inputClass}
           />
         </div>
@@ -272,23 +345,23 @@ export default function SignupForm() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Degree</label>
-              <input name="degree" placeholder="e.g. B.Tech, B.Sc" className={inputClass} />
+              <input name="degree" required placeholder="e.g. B.Tech, B.Sc" className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Branch/Major</label>
-              <input name="branch" placeholder="e.g. Computer Science" className={inputClass} />
+              <input name="branch" required placeholder="e.g. Computer Science" className={inputClass} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Admission Year</label>
-              <input name="yearOfAdmission" type="number" placeholder="2023" className={inputClass} />
+              <input name="yearOfAdmission" required type="number" placeholder="2023" className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Year</label>
               <div className="relative">
-                <select name="year" className={inputClass + " appearance-none pr-10"}>
+                <select name="year" required className={inputClass + " appearance-none pr-10"}>
                   <option value="">Select</option>
                   {[1, 2, 3, 4, 5].map((s) => (
                     <option key={s} value={s}>
@@ -301,13 +374,14 @@ export default function SignupForm() {
               </div>
             </div>
           </div>
+
         </>
       )}
 
-      {role === "alumni" || role === "student" && (
+      {(role === "student" || role === "alumni") && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Passing Year</label>
-          <input name="passingYear" type="number" placeholder="2027" className={inputClass} />
+          <input name="passingYear" required type="number" placeholder="2027" className={inputClass} />
         </div>
       )}
 

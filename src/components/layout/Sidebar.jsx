@@ -1,16 +1,27 @@
 import { Link, useLocation } from "react-router-dom";
 import { LayoutGrid, Calendar, Users, Megaphone, User, School } from "lucide-react";
+import { useMe } from "../../hooks/useMe";
 
 export default function Sidebar() {
     const location = useLocation();
+    const { data: me } = useMe();
 
-    const links = [
+    const allLinks = [
         { name: "Feed", icon: LayoutGrid, path: "/" },
         { name: "College", icon: School, path: "/college" },
         { name: "Clubs", icon: Users, path: "/clubs" },
         { name: "Events", icon: Calendar, path: "/events" },
         { name: "Announcements", icon: Megaphone, path: "/announcements" },
     ];
+
+    // Filter links for external users
+    const links = allLinks.filter(link => {
+        if (me?.roleInCollege === 'external') {
+            const restricted = ["College", "Clubs", "Announcements"];
+            return !restricted.includes(link.name);
+        }
+        return true;
+    });
 
     return (
         <>

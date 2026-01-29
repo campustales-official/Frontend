@@ -104,6 +104,12 @@ function GuardedRoutes() {
     return <Navigate to="/" replace />;
   }
 
+  // 🌐 External User Redirection from restricted routes
+  const restrictedPathsForExternal = ["/announcements", "/college", "/clubs"];
+  if (me.roleInCollege === 'external' && restrictedPathsForExternal.some(p => path.startsWith(p))) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <Routes>
       {/* 

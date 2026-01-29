@@ -61,9 +61,12 @@ export const deleteEvent = async ({ collegeId, clubId, eventId }) => {
     return res.data;
 };
 
-export const registerForEvent = async ({ collegeId, clubId, eventId, answers, visibility }) => {
+export const registerForEvent = async ({ collegeId, clubId, eventId, answers, visibility, isExternal }) => {
     let url;
-    if (collegeId && (visibility === 'college' || visibility === 'club')) {
+    console.log(isExternal);
+    if (isExternal) {
+        url = `/external/events/${eventId}/register`;
+    } else if (collegeId && (visibility === 'college' || visibility === 'club')) {
         url = `/colleges/${collegeId}/events/${eventId}/register`;
     } else {
         url = `/events/${eventId}/register`;

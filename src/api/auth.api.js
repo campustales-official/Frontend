@@ -6,6 +6,9 @@ export const login = (data) =>
 export const signup = (data) =>
   api.post("/signup", data);
 
+export const externalSignup = (data) =>
+  api.post("/external/signup", data);
+
 export const googleLogin = (idToken) =>
   api.post("/login/google", { idToken });
 

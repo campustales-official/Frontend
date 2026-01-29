@@ -14,7 +14,10 @@ export default function LoginForm() {
   // Email/Password login mutation
   const { mutate, isPending } = useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      const role = res.data?.data?.roleInCollege;
+      if (role) localStorage.setItem("roleInCollege", role);
+
       toast.success("Login successful! Redirecting...");
       queryClient.invalidateQueries(["me"]);
     },
@@ -26,7 +29,10 @@ export default function LoginForm() {
   // Google login mutation
   const { mutate: mutateGoogle } = useMutation({
     mutationFn: googleLogin,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      const role = res.data?.data?.roleInCollege;
+      if (role) localStorage.setItem("roleInCollege", role);
+
       setIsGooglePending(false);
       toast.success("Google login successful! Redirecting...");
       queryClient.invalidateQueries(["me"]);

@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useMe } from "../../hooks/useMe";
 import { logout } from "../../api/auth.api";
-import { updateUserProfile } from "../../api/user.api";
+import { updateUserProfile, updateExternalProfile } from "../../api/user.api";
 import ChangePasswordModal from "../../components/profile/ChangePasswordModal";
 import ChangeEmailModal from "../../components/profile/ChangeEmailModal";
 import {
@@ -22,7 +22,9 @@ import {
     Layers,
     Lock,
     CheckCircle2,
-    Loader2
+    Loader2,
+    Phone,
+    MapPin
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -38,12 +40,16 @@ export default function ProfilePage() {
         name: "",
         branch: "",
         degree: "",
-        // semester: "",
         year: "",
         yearOfAdmission: "",
         passingYear: "",
         identifierType: "",
-        identifierValue: ""
+        identifierValue: "",
+        // External user fields
+        collegeName: "",
+        collegeAisheCode: "",
+        collegeCity: "",
+        collegeState: ""
     });
 
     // Sync formData when me loads
@@ -53,12 +59,16 @@ export default function ProfilePage() {
                 name: me.name || "",
                 branch: me.branch || "",
                 degree: me.degree || "",
-                // semester: me.semester || "",
                 year: me.year || "",
                 yearOfAdmission: me.yearOfAdmission || "",
                 passingYear: me.passingYear || "",
                 identifierType: me.identifiers?.student?.type || "",
-                identifierValue: me.identifiers?.student?.value || ""
+                identifierValue: me.identifiers?.student?.value || "",
+                // External user fields (API returns nested college object)
+                collegeName: me.college?.name || "",
+                collegeAisheCode: me.college?.aisheCode || "",
+                collegeCity: me.college?.city || "",
+                collegeState: me.college?.state || ""
             });
         }
     }, [me]);
@@ -67,6 +77,7 @@ export default function ProfilePage() {
         mutationFn: logout,
         onSuccess: () => {
             queryClient.clear();
+            localStorage.removeItem("roleInCollege");
             toast.success("Logged out successfully");
             navigate("/login");
         },
@@ -77,7 +88,12 @@ export default function ProfilePage() {
     });
 
     const updateProfileMutation = useMutation({
-        mutationFn: (data) => updateUserProfile({ collegeId: me.college.id, data }),
+        mutationFn: (data) => {
+            if (me.roleInCollege === 'external') {
+                return updateExternalProfile(data);
+            }
+            return updateUserProfile({ collegeId: me.college.id, data });
+        },
         onSuccess: (res) => {
             toast.success(res.message || "Profile updated successfully");
             queryClient.invalidateQueries({ queryKey: ["me"] });
@@ -93,14 +109,15 @@ export default function ProfilePage() {
     };
 
     const handleSave = () => {
+        const isExternal = me.roleInCollege === 'external';
+
         const payload = {
             name: formData.name,
             branch: formData.branch,
             degree: formData.degree,
-            // semester: Number(formData.semester) || formData.semester,
-            year: Number(formData.year) || formData.year,
-            yearOfAdmission: Number(formData.yearOfAdmission) || formData.yearOfAdmission,
-            passingYear: Number(formData.passingYear) || formData.passingYear,
+            year: Number(formData.year) || undefined,
+            yearOfAdmission: Number(formData.yearOfAdmission) || undefined,
+            passingYear: Number(formData.passingYear) || undefined,
             identifiers: {
                 student: {
                     type: formData.identifierType,
@@ -108,6 +125,15 @@ export default function ProfilePage() {
                 }
             }
         };
+
+        // Add external-specific fields
+        if (isExternal) {
+            payload.collegeName = formData.collegeName || undefined;
+            payload.collegeAisheCode = formData.collegeAisheCode || undefined;
+            payload.collegeCity = formData.collegeCity || undefined;
+            payload.collegeState = formData.collegeState || undefined;
+        }
+
         updateProfileMutation.mutate(payload);
     };
 
@@ -220,7 +246,46 @@ export default function ProfilePage() {
                                     />
                                 </div>
 
-                                <div className="md:col-span-2 border-t border-gray-50 pt-6 mt-2"></div>
+                                <div className="md:col-span-2 border-t border-gray-50 mt-2"></div>
+
+                                {/* External user fields */}
+                                {me.roleInCollege === 'external' && (
+                                    <>
+                                        <div className="grid grid-cols-2 gap-4 col-span-1 md:col-span-2">
+                                        <EditableInfoItem
+                                            label="College Name"
+                                            value={formData.collegeName}
+                                            icon={<Building2 className="w-4 h-4" />}
+                                            isEditing={isEditing}
+                                            onChange={(val) => setFormData(prev => ({ ...prev, collegeName: val }))}
+                                        />
+                                        <EditableInfoItem
+                                            label="AISHE Code"
+                                            value={formData.collegeAisheCode}
+                                            icon={<Hash className="w-4 h-4" />}
+                                            isEditing={isEditing}
+                                            onChange={(val) => setFormData(prev => ({ ...prev, collegeAisheCode: val }))}
+                                        />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4 col-span-1 md:col-span-2">
+                                            <EditableInfoItem
+                                                label="College City"
+                                                value={formData.collegeCity}
+                                                icon={<MapPin className="w-4 h-4" />}
+                                                isEditing={isEditing}
+                                                onChange={(val) => setFormData(prev => ({ ...prev, collegeCity: val }))}
+                                            />
+                                            <EditableInfoItem
+                                                label="College State"
+                                                value={formData.collegeState}
+                                                icon={<MapPin className="w-4 h-4" />}
+                                                isEditing={isEditing}
+                                                onChange={(val) => setFormData(prev => ({ ...prev, collegeState: val }))}
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2 border-t border-gray-50 mt-2"></div>
+                                    </>
+                                )}
 
                                 <EditableInfoItem
                                     label="Branch"
@@ -390,7 +455,7 @@ function EditableInfoItem({ label, value, icon, isEditing, onChange, type = "tex
 
 function SettingsLink({ icon, label, sub }) {
     return (
-        <button className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 group transition-all">
+        <div className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 group transition-all cursor-pointer">
             <div className="flex items-center gap-4">
                 <div className="p-2.5 rounded-xl bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition">
                     {icon}
@@ -401,6 +466,6 @@ function SettingsLink({ icon, label, sub }) {
                 </div>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition" />
-        </button>
+        </div>
     );
 }
