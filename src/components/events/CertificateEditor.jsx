@@ -521,6 +521,8 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
                                 `Upload a high-resolution ${orientation} image.`,
                                 "Include your logos, signatures, and static text directly in the background image.",
                                 "Use placeholders like {{name}} for text that should change per student.",
+                                "Change text block sizes and positions to fit your design and avoid text wrapping.",
+                                "Don't overlap text blocks with each other.",
                                 "The 'Live Grid' and 'Registration Details' will use these templates for downloads."
                             ].map((text, i) => (
                                 <li key={i} className="flex items-start gap-2 text-xs font-bold text-amber-700/80 leading-relaxed">

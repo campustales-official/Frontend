@@ -526,11 +526,23 @@ export default function EventFormBase({
                         <ul className="text-sm space-y-4 opacity-90">
                             <li className="flex gap-3">
                                 <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 text-[10px] font-bold">1</span>
-                                <p>Use a high-quality banner to increase engagement.</p>
+                                <p>Use a high-quality banner and proper banner size to increase engagement.</p>
                             </li>
                             <li className="flex gap-3">
                                 <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 text-[10px] font-bold">2</span>
                                 <p>Clearly state the registration deadline.</p>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 text-[10px] font-bold">5</span>
+                                <p>Add custom questions to collect specific information.</p>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 text-[10px] font-bold">6</span>
+                                <p>Enable certificates to reward participants.</p>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 text-[10px] font-bold">7</span>
+                                <p>Include every detail of the event in the description like rules, prizes, teamsize, etc.</p>
                             </li>
                         </ul>
                     </section>
