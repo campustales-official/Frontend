@@ -286,15 +286,15 @@ export default function SignupForm() {
             <input name="collegeName" required placeholder="Enter full college name" className={inputClass} />
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">AISHE Code (Optional)</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">AISHE Code </label>
                 <input name="collegeAisheCode" placeholder="U-123" className={inputClass} />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">City (Optional)</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">City </label>
                 <input name="collegeCity" placeholder="Bhopal" className={inputClass} />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">State (Optional)</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">State </label>
                 <input name="collegeState" placeholder="Madhya Pradesh" className={inputClass} />
               </div>
             </div>

@@ -87,7 +87,7 @@ export default function AdminPanel() {
             <div className="max-w-7xl mx-auto">
                 <header className="mb-10">
                     <h1 className="text-3xl font-black text-gray-900 mb-2">Platform Overview</h1>
-                    <p className="text-gray-500">Real-time statistics and administrative actions for the Inter-College Hub.</p>
+                    <p className="text-gray-500">Real-time statistics and administrative actions for the CampusTales.</p>
                 </header>
 
                 {/* Quick Actions */}

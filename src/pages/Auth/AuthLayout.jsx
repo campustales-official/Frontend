@@ -38,10 +38,10 @@ export default function AuthLayout({ isSignup, children }) {
                       <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                     </svg>
                   </div>
-                  <span className="text-xl font-semibold tracking-tight">CollegeConnect</span>
+                  <span className="text-xl font-semibold tracking-tight">CampusTales</span>
                 </div>
                 <p className="text-base leading-relaxed text-white/90 border-l-4 border-blue-500 pl-4">
-                  "CollegeConnect has completely transformed how our student body collaborates on inter-disciplinary projects. It's the digital campus we always needed."
+                  "CampusTales has completely transformed how our student body collaborates on inter-disciplinary projects. It's the digital campus we always needed."
                 </p>
               </div>
             </motion.div>
@@ -73,10 +73,10 @@ export default function AuthLayout({ isSignup, children }) {
                       <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                     </svg>
                   </div>
-                  <span className="text-xl font-semibold tracking-tight">CollegeConnect</span>
+                  <span className="text-xl font-semibold tracking-tight">CampusTales</span>
                 </div>
                 <p className="text-base leading-relaxed text-white/90 border-l-4 border-blue-500 pl-4">
-                  "Joining CollegeConnect opened doors to research opportunities I didn't know existed. It's the ultimate network for ambitious students."
+                  "Joining CampusTales opened doors to research opportunities I didn't know existed. It's the ultimate network for ambitious students."
                 </p>
               </div>
             </motion.div>

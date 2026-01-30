@@ -5,6 +5,7 @@ import { Calendar, MapPin, Clock, Share2, User, Info, ArrowRight, Loader2, Arrow
 import { formatSafeDate } from "../../utils/date.utils";
 import { useMe } from "../../hooks/useMe";
 import { toast } from "react-toastify";
+import EventQRCode from "../../components/events/EventQRCode";
 
 export default function EventDetailsPage() {
     const { eventId } = useParams();
@@ -233,6 +234,11 @@ export default function EventDetailsPage() {
                                 <Share2 className="w-4 h-4" />
                                 Share Event
                             </button>
+
+                            <EventQRCode
+                                url={window.location.href}
+                                eventTitle={event.title}
+                            />
                         </div>
                     </div>
 

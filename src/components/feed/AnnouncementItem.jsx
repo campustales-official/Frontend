@@ -20,7 +20,7 @@ export default function AnnouncementItem({ item, actions }) {
   let entityName, entitySubtext, Icon, iconBgClass;
 
   if (isCritical) {
-    entityName = "Inter-College Hub";
+    entityName = "CampusTales";
     entitySubtext = "System Announcement";
     Icon = AlertTriangle;
     iconBgClass = "bg-red-50 border-red-100 text-red-600";

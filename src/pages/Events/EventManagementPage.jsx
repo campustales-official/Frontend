@@ -15,6 +15,7 @@ import {
     deleteEvent, getEventRegistrations, downloadRegistrationsExcel, generateBulkCertificates, generateCertificate
 } from "../../api/events.api";
 import { formatSafeDate } from "../../utils/date.utils";
+import EventQRCode from "../../components/events/EventQRCode";
 
 export default function EventManagementPage() {
     const navigate = useNavigate();
@@ -469,6 +470,11 @@ export default function EventManagementPage() {
                             Certificate Designer
                         </button>
                     </div>
+
+                    <EventQRCode
+                        url={window.location.origin + `/events/${eventId}`}
+                        eventTitle={event.title}
+                    />
 
                     {/* Quick Summary Sidebar Card */}
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
