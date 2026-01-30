@@ -40,6 +40,8 @@ import RegistrationDetailPage from "./pages/Events/RegistrationDetailPage";
 import MyRegistrationPage from "./pages/Events/MyRegistrationPage";
 import EventRegistrationsLivePage from "./pages/Events/EventRegistrationsLivePage";
 import CertificateTemplatePage from "./pages/Events/CertificateTemplatePage";
+import PrivacyPolicy from "./pages/Legal/PrivacyPolicy";
+import TermsConditions from "./pages/Legal/TermsConditions";
 
 function GuardedRoutes() {
   const location = useLocation();
@@ -53,13 +55,15 @@ function GuardedRoutes() {
   // 🔐 Not logged in
   if (!isLoggedIn) {
     // Allow access to login/signup/forgot-password only
-    const publicPaths = ["/login", "/signup", "/forgot-password"];
+    const publicPaths = ["/login", "/signup", "/forgot-password", "/privacy-policy", "/terms-conditions"];
     if (publicPaths.includes(path)) {
       return (
         <Routes>
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-conditions" element={<TermsConditions />} />
           <Route path="*" element={<Navigate to="/login" state={{ from: location }} replace />} />
         </Routes>
       );
@@ -119,6 +123,8 @@ function GuardedRoutes() {
       <Route path="/login" element={<AuthPage />} />
       <Route path="/signup" element={<AuthPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-conditions" element={<TermsConditions />} />
       <Route path="/verify-email" element={<VerifyEmailOtpPage />} />
 
       {/* Admin Routes */}

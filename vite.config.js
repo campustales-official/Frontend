@@ -9,22 +9,23 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg"],
+      includeAssets: ["logo.png"],
       manifest: {
-        name: "College Platform",
-        short_name: "College",
+        name: "CampusTales",
+        short_name: "CampusTales",
+        description: "A college-centric digital platform for students, clubs, and institutions.",
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",
-        theme_color: "#000000",
+        theme_color: "#2563eb",
         icons: [
           {
-            src: "/pwa-192x192.png",
+            src: "/logo.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/logo.png",
             sizes: "512x512",
             type: "image/png",
           },

@@ -41,9 +41,8 @@ export default function AuthPage() {
 
           {/* Footer Links */}
           <div className="mt-6 flex items-center justify-center gap-4 text-xs text-gray-400">
-            <a href="#" className="hover:text-gray-600">Terms of Service</a>
-            <a href="#" className="hover:text-gray-600">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-600">Help Center</a>
+            <Link to="/terms-conditions" className="hover:text-gray-600">Terms of Service</Link>
+            <Link to="/privacy-policy" className="hover:text-gray-600">Privacy Policy</Link>
           </div>
         </motion.div>
       </AnimatePresence>

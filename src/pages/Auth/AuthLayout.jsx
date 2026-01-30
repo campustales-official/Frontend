@@ -33,11 +33,7 @@ export default function AuthLayout({ isSignup, children }) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               <div className="absolute bottom-10 left-10 right-10 z-10 text-white max-w-md">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                  </div>
+                  <img src="/logo.png" alt="CampusTales" className="w-10 h-10 object-contain" />
                   <span className="text-xl font-semibold tracking-tight">CampusTales</span>
                 </div>
                 <p className="text-base leading-relaxed text-white/90 border-l-4 border-blue-500 pl-4">

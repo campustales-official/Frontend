@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { signup, externalSignup } from "../../api/auth.api";
 import { useCollegeSearch } from "../../hooks/useCollegeSearch";
-import { Eye, EyeOff, Search, ChevronDown } from "lucide-react";
+import { Eye, EyeOff, Search, ChevronDown, AlertCircle } from "lucide-react";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 import { queryClient } from "../../lib/queryClient.js";
 
 export default function SignupForm() {
@@ -395,9 +396,9 @@ export default function SignupForm() {
         />
         <span className="text-sm text-gray-600">
           I agree to the{" "}
-          <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>{" "}
+          <Link to="/terms-conditions" className="text-blue-600 hover:underline">Terms of Service</Link>{" "}
           and{" "}
-          <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
+          <Link to="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
         </span>
       </label>
 
