@@ -6,11 +6,13 @@ import Modal from "../common/Modal";
 import { createClubPost } from "../../api/clubs.api";
 import { createCollegePost } from "../../api/colleges.api";
 import { Eye, Globe, Building2, Users as UsersIcon } from "lucide-react";
+import { compressImage } from "../../utils/image.utils";
 
 export default function CreatePostModal({ isOpen, onClose, clubId, collegeId, isCollegeScope = false }) {
     const [content, setContent] = useState("");
     const [visibility, setVisibility] = useState(isCollegeScope ? "college" : "club");
     const [files, setFiles] = useState([]);
+    const [isProcessing, setIsProcessing] = useState(false);
     const fileInputRef = useRef(null);
     const queryClient = useQueryClient();
 
@@ -43,7 +45,7 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId, is
         }
     };
 
-    const processFiles = (newFiles) => {
+    const processFiles = async (newFiles) => {
         const validFiles = newFiles.filter(file => file.type.startsWith("image/"));
 
         if (validFiles.length !== newFiles.length) {
@@ -64,7 +66,18 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId, is
             toast.warning(`Only added ${filesToAdd.length} file(s) to stay within the 5-file limit.`);
         }
 
-        setFiles(prev => [...prev, ...filesToAdd]);
+        setIsProcessing(true);
+        try {
+            const compressedResults = await Promise.all(
+                filesToAdd.map(file => compressImage(file, 0.7))
+            );
+            setFiles(prev => [...prev, ...compressedResults]);
+        } catch (error) {
+            console.error("Compression failed", error);
+            toast.error("Failed to process some images.");
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     const removeFile = (index) => {
@@ -174,11 +187,11 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId, is
                 <div className="pt-2 flex justify-end">
                     <button
                         onClick={handleSubmit}
-                        disabled={isPending}
+                        disabled={isPending || isProcessing}
                         className="bg-gray-900 hover:bg-black text-white font-bold py-2.5 px-8 rounded-xl shadow-lg shadow-gray-200 transition active:scale-95 disabled:opacity-70 flex items-center gap-2"
                     >
-                        {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                        Publish Post
+                        {(isPending || isProcessing) && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {isProcessing ? "Optimizing..." : "Publish Post"}
                     </button>
                 </div>
             </div>

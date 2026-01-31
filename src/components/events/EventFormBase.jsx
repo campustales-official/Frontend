@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useMe } from "../../hooks/useMe";
 import { toast } from "react-toastify";
+import { compressImage } from "../../utils/image.utils";
 
 const QUESTION_TYPES = [
     { value: "text", label: "Short Text", icon: Type },
@@ -139,11 +140,17 @@ export default function EventFormBase({
         }));
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            setBanner(file);
-            setBannerPreview(URL.createObjectURL(file));
+            try {
+                const compressed = await compressImage(file, 0.7);
+                setBanner(compressed);
+                setBannerPreview(URL.createObjectURL(compressed));
+            } catch (error) {
+                console.error("Banner compression failed", error);
+                toast.error("Failed to process banner image.");
+            }
         }
     };
 

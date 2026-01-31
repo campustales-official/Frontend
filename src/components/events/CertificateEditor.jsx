@@ -4,6 +4,7 @@ import {
     Trash2, Plus, Image as ImageIcon, Info, ChevronRight, HelpCircle, Loader2, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { compressImage } from '../../utils/image.utils';
 
 const SYSTEM_FIELD_LABELS = {
     branch: "Branch",
@@ -63,10 +64,19 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
         }
     };
 
-    const handleCropComplete = (blob, url) => {
-        setBackground(url);
-        setBackgroundFile(new File([blob], "background.png", { type: "image/png" }));
-        setShowCropper(false);
+    const handleCropComplete = async (blob, url) => {
+        try {
+            setBackground(url);
+            const file = new File([blob], "background.png", { type: "image/png" });
+            const compressed = await compressImage(file, 0.7);
+            setBackgroundFile(compressed);
+            setShowCropper(false);
+        } catch (error) {
+            console.error("Background compression failed", error);
+            // Fallback to original if compression fails
+            setBackgroundFile(new File([blob], "background.png", { type: "image/png" }));
+            setShowCropper(false);
+        }
     };
 
     const addTextBlock = () => {

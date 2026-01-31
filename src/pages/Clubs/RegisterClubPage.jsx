@@ -9,6 +9,7 @@ import {
     User, Calendar, Hash, Upload, ImageIcon, Loader2
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { compressImage } from "../../utils/image.utils";
 
 export default function RegisterClubPage() {
     const navigate = useNavigate();
@@ -69,16 +70,22 @@ export default function RegisterClubPage() {
     const [logoPreview, setLogoPreview] = useState(null);
     const [coverPreview, setCoverPreview] = useState(null);
 
-    const handleFileChange = (e, type) => {
+    const handleFileChange = async (e, type) => {
         const file = e.target.files[0];
         if (file) {
-            setFiles(prev => ({ ...prev, [type]: file }));
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (type === 'logo') setLogoPreview(reader.result);
-                else setCoverPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            try {
+                const compressed = await compressImage(file, 0.7);
+                setFiles(prev => ({ ...prev, [type]: compressed }));
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    if (type === 'logo') setLogoPreview(reader.result);
+                    else setCoverPreview(reader.result);
+                };
+                reader.readAsDataURL(compressed);
+            } catch (error) {
+                console.error("Image compression failed", error);
+                toast.error(`Failed to process ${type} image.`);
+            }
         }
     };
 
