@@ -80,10 +80,11 @@ export default function CreateEventPage() {
                 onSubmit={onSubmit}
                 initialData={{ visibility: searchParams.get("visibility") || "college" }}
                 isSubmitting={isPending || hasSucceeded}
+                clubId={clubId}
             />
 
             {/* Sticky Actions Bar */}
-            <div className="fixed bottom-15 sm:bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 sm:py-4 py-2 sm:px-6 px-2 z-30">
+            <div className="fixed bottom-14 md:bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 sm:py-4 py-2 sm:px-6 px-2 z-30">
                 <div className="max-w-6xl mx-auto flex items-center justify-between">
                     <button
                         type="button" onClick={handleDiscard}

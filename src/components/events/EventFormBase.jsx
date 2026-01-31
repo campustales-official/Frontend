@@ -18,7 +18,7 @@ const QUESTION_TYPES = [
 const VISIBILITY_OPTIONS = [
     { value: "global", label: "Public (Open to All)" },
     { value: "college", label: "College Only" },
-    { value: "club", label: "Club Only" },
+    { value: "club", label: "Club Only", clubOnly: true },
 ];
 
 const REQUIRED_USER_FIELDS = [
@@ -37,8 +37,15 @@ export default function EventFormBase({
     initialData = {},
     onSubmit,
     id = "event-form",
-    isSubmitting = false
+    isSubmitting = false,
+    clubId = null
 }) {
+    // Filter options based on scope
+    const filteredVisibilityOptions = VISIBILITY_OPTIONS.filter(opt => {
+        if (opt.clubOnly && !clubId) return false;
+        return true;
+    });
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -260,7 +267,7 @@ export default function EventFormBase({
                                             name="visibility" value={formData.visibility} onChange={handleChange}
                                             className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none transition appearance-none bg-white"
                                         >
-                                            {VISIBILITY_OPTIONS.map(opt => (
+                                            {filteredVisibilityOptions.map(opt => (
                                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
                                             ))}
                                         </select>

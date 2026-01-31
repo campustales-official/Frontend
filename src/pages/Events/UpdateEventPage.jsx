@@ -69,6 +69,7 @@ export default function UpdateEventPage() {
                 id="update-event-form"
                 initialData={event}
                 onSubmit={(data) => handleUpdate(data)}
+                clubId={event?.clubId || event?.club?._id || event?.club?.id || null}
             />
 
             {/* Sticky Actions Bar */}

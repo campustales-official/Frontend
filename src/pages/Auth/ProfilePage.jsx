@@ -236,7 +236,7 @@ export default function ProfilePage() {
                                 <InfoItem label="Email" value={me.email} icon={<Mail className="w-4 h-4" />} />
 
                                 <div className="grid grid-cols-2 gap-4 col-span-1 md:col-span-2">
-                                    <InfoItem label="Role in College" value={me.roleInCollege} icon={<User className="w-4 h-4" />} />
+                                    <InfoItem label="Role in College" value={me.roleInCollege === "external" ? "student" : me.roleInCollege} icon={<User className="w-4 h-4" />} />
                                     <EditableInfoItem
                                         label={getIdentifierLabel(formData.identifierType)}
                                         value={formData.identifierValue}
@@ -252,20 +252,20 @@ export default function ProfilePage() {
                                 {me.roleInCollege === 'external' && (
                                     <>
                                         <div className="grid grid-cols-2 gap-4 col-span-1 md:col-span-2">
-                                        <EditableInfoItem
-                                            label="College Name"
-                                            value={formData.collegeName}
-                                            icon={<Building2 className="w-4 h-4" />}
-                                            isEditing={isEditing}
-                                            onChange={(val) => setFormData(prev => ({ ...prev, collegeName: val }))}
-                                        />
-                                        <EditableInfoItem
-                                            label="AISHE Code"
-                                            value={formData.collegeAisheCode}
-                                            icon={<Hash className="w-4 h-4" />}
-                                            isEditing={isEditing}
-                                            onChange={(val) => setFormData(prev => ({ ...prev, collegeAisheCode: val }))}
-                                        />
+                                            <EditableInfoItem
+                                                label="College Name"
+                                                value={formData.collegeName}
+                                                icon={<Building2 className="w-4 h-4" />}
+                                                isEditing={isEditing}
+                                                onChange={(val) => setFormData(prev => ({ ...prev, collegeName: val }))}
+                                            />
+                                            <EditableInfoItem
+                                                label="AISHE Code"
+                                                value={formData.collegeAisheCode}
+                                                icon={<Hash className="w-4 h-4" />}
+                                                isEditing={isEditing}
+                                                onChange={(val) => setFormData(prev => ({ ...prev, collegeAisheCode: val }))}
+                                            />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 col-span-1 md:col-span-2">
                                             <EditableInfoItem
@@ -390,7 +390,12 @@ export default function ProfilePage() {
                                                 {cr.name?.substring(0, 2).toUpperCase() || "CL"}
                                             </div>
                                             <div className="overflow-hidden">
-                                                <div className="font-bold text-gray-900 truncate text-sm">{cr.name}</div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="font-bold text-gray-900 truncate text-sm">{cr.name}</div>
+                                                    <span className="inline-block text-[10px] font-black uppercase tracking-wider text-red-600 px-2 py-0.5 rounded mt-1">
+                                                        {cr.isActive ? "" : "Approval Pending"}
+                                                    </span>
+                                                </div>
                                                 <span className="inline-block text-[10px] font-black uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded mt-1">
                                                     {cr.role}
                                                 </span>
