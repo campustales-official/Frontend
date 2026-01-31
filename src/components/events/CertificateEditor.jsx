@@ -72,7 +72,6 @@ export default function CertificateEditor({ event, initialData, onSave, isSaving
             setBackgroundFile(compressed);
             setShowCropper(false);
         } catch (error) {
-            console.error("Background compression failed", error);
             // Fallback to original if compression fails
             setBackgroundFile(new File([blob], "background.png", { type: "image/png" }));
             setShowCropper(false);

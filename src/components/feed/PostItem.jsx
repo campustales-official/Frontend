@@ -31,7 +31,7 @@ const PostImageCarousel = ({ images }) => {
             <img
                 src={images[0]}
                 alt=""
-                className="w-full rounded-lg max-h-96 object-cover border border-gray-100"
+                className="w-full rounded-lg max-h-96 object-fill border border-gray-100"
             />
         );
     }
@@ -46,11 +46,11 @@ const PostImageCarousel = ({ images }) => {
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 {images.map((src, index) => (
-                    <div key={index} className="w-full flex-shrink-0 snap-center relative pt-[60%]">
+                    <div key={index} className="w-full flex-shrink-0 snap-center relative pt-[56%]">
                         <img
                             src={src}
                             alt={`Post ${index + 1}`}
-                            className="absolute inset-0 w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-fill"
                         />
                     </div>
                 ))}

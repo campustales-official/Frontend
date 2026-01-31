@@ -83,7 +83,6 @@ export default function RegisterClubPage() {
                 };
                 reader.readAsDataURL(compressed);
             } catch (error) {
-                console.error("Image compression failed", error);
                 toast.error(`Failed to process ${type} image.`);
             }
         }

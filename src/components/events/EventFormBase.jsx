@@ -148,7 +148,6 @@ export default function EventFormBase({
                 setBanner(compressed);
                 setBannerPreview(URL.createObjectURL(compressed));
             } catch (error) {
-                console.error("Banner compression failed", error);
                 toast.error("Failed to process banner image.");
             }
         }

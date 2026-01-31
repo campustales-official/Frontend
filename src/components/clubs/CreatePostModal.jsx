@@ -140,6 +140,7 @@ export default function CreatePostModal({ isOpen, onClose, clubId, collegeId, is
                     </div>
                     <p className="text-sm font-medium text-gray-700">Click to upload or drag and drop</p>
                     <p className="text-xs text-gray-400 mt-1">SVG, PNG, JPG or GIF (max. 5)</p>
+                    <p className="text-xs text-gray-400 mt-1">Note: Please upload images in 16:9 aspect ratio for best results.</p>
                 </div>
 
                 {/* Previews */}
