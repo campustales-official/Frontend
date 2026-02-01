@@ -136,7 +136,7 @@ const TermsConditions = () => {
                         <section>
                             <h2 className="text-xl font-semibold text-gray-900 mb-4">13. Contact</h2>
                             <p>For support or legal inquiries:</p>
-                            <p className="font-medium text-blue-600">📧 support@campustales.com</p>
+                            <p className="font-medium text-blue-600">📧 <a href="mailto:support@campustales.com">support@campustales.com</a></p>
                         </section>
                     </div>
                 </div>
