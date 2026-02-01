@@ -147,7 +147,7 @@ export default function PostItem({ item, actions }) {
     });
 
     return (
-        <article className="rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 border-r-4 border-r-blue-500 p-5">
+        <article className="rounded-xl bg-white shadow-sm hover:shadow-md transition duration-200 border-0 border-r-4 border-r-blue-500 p-2 sm:p-5">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
                 <div className="flex gap-3">
