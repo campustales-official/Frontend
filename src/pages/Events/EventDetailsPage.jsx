@@ -218,7 +218,7 @@ export default function EventDetailsPage() {
 
                                 {event.status !== 'published' && (
                                     <div className="mt-4 p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg text-center border border-red-100">
-                                        Event is currently {event.status.replace('_', ' ').toUpperCase()}
+                                        {event.status.replace('_', ' ').toUpperCase()}
                                     </div>
                                 )}
 
