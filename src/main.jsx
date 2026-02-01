@@ -11,9 +11,15 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <QueryClientProvider client={queryClient}>
-      <App />
+        <App />
       </QueryClientProvider>
-      <ToastContainer position="bottom-right" autoClose={3000} theme='colored' />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme='colored'
+        toastClassName="!mt-14 !mb-2 !rounded-xl !p-2 !min-h-0 !w-auto !text-xs sm:!text-sm sm:!p-4 shadow-xl font-medium"
+        bodyClassName="!p-0 !m-0"
+      />
     </GoogleOAuthProvider>
   </StrictMode >,
 )

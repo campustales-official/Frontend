@@ -73,11 +73,11 @@ export default function UpdateEventPage() {
             />
 
             {/* Sticky Actions Bar */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 py-4 px-6 z-30">
+            <div className="fixed bottom-14 md:bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 sm:py-4 py-2 sm:px-6 px-2 z-30">
                 <div className="max-w-6xl mx-auto flex items-center justify-between">
                     <button
                         type="button" onClick={() => navigate(-1)}
-                        className="text-sm font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2"
+                        className="text-xs sm:text-sm font-bold text-gray-500 hover:text-gray-900 transition flex items-center gap-2 sm:px-16"
                     >
                         <X className="w-4 h-4" /> Discard Changes
                     </button>
@@ -88,7 +88,7 @@ export default function UpdateEventPage() {
                         onClick={() => {
                             document.getElementById("update-event-form").requestSubmit();
                         }}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-xl font-bold transition flex items-center gap-2 disabled:opacity-70 shadow-lg shadow-blue-500/20 active:scale-95"
+                        className="bg-blue-600 hover:bg-blue-700 text-white sm:px-8 sm:py-3 py-2 px-6 text-xs sm:text-sm rounded-xl font-bold transition flex items-center gap-2 disabled:opacity-70 shadow-lg shadow-blue-500/20 active:scale-95"
                     >
                         {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         Update Event
