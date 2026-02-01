@@ -22,6 +22,12 @@ export default function SignupForm() {
     number: false
   });
 
+  // Dynamic dropdown state
+  const [degree, setDegree] = useState("");
+  const [branch, setBranch] = useState("");
+  const [availableDegrees, setAvailableDegrees] = useState([]);
+  const [availableBranches, setAvailableBranches] = useState([]);
+
   const checkStrength = (pass) => {
     setPasswordCriteria({
       length: pass.length >= 8,
@@ -265,6 +271,11 @@ export default function SignupForm() {
                       setCollege(c);
                       setQuery(c.name);
                       setShowDropdown(false);
+                      // Reset degree/branch when college changes
+                      setDegree("");
+                      setBranch("");
+                      setAvailableDegrees(c.degrees ? Object.keys(c.degrees) : []);
+                      setAvailableBranches([]);
                     }}
                     className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm text-gray-700"
                   >
@@ -346,11 +357,66 @@ export default function SignupForm() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Degree</label>
-              <input name="degree" required placeholder="e.g. B.Tech, B.Sc" className={inputClass} />
+              {availableDegrees.length > 0 ? (
+                <div className="relative">
+                  <select
+                    name="degree"
+                    required
+                    value={degree}
+                    onChange={(e) => {
+                      const d = e.target.value;
+                      setDegree(d);
+                      setAvailableBranches(college?.degrees?.[d] || []);
+                      setBranch(""); // Reset branch when degree changes
+                    }}
+                    className={inputClass + " appearance-none pr-10"}
+                  >
+                    <option value="">Select Degree</option>
+                    {availableDegrees.map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
+              ) : (
+                <input
+                  name="degree"
+                  required
+                  placeholder="e.g. B.Tech, B.Sc"
+                  value={degree}
+                  onChange={(e) => setDegree(e.target.value)}
+                  className={inputClass}
+                />
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Branch/Major</label>
-              <input name="branch" required placeholder="e.g. Computer Science" className={inputClass} />
+              {availableBranches.length > 0 ? (
+                <div className="relative">
+                  <select
+                    name="branch"
+                    required
+                    value={branch}
+                    onChange={(e) => setBranch(e.target.value)}
+                    className={inputClass + " appearance-none pr-10"}
+                  >
+                    <option value="">Select Branch</option>
+                    {availableBranches.map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
+              ) : (
+                <input
+                  name="branch"
+                  required
+                  placeholder="e.g. Computer Science"
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value)}
+                  className={inputClass}
+                />
+              )}
             </div>
           </div>
 
