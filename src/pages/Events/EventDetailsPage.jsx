@@ -153,8 +153,25 @@ export default function EventDetailsPage() {
                                 <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
                                 About Event
                             </h2>
-                            <div className="prose prose-lg text-gray-600 leading-relaxed whitespace-pre-wrap max-w-none">
-                                {event.description || "To be announced"}
+                            <div className="prose prose-lg text-gray-600 leading-relaxed whitespace-pre-wrap max-w-none break-words">
+                                {event.description ? (
+                                    event.description.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                                        part.match(/^https?:\/\//) ? (
+                                            <a
+                                                key={i}
+                                                href={part}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:underline break-all"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {part}
+                                            </a>
+                                        ) : part
+                                    )
+                                ) : (
+                                    "To be announced"
+                                )}
                             </div>
                         </div>
 
