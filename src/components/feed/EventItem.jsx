@@ -57,7 +57,7 @@ export default function EventItem({ item, actions, showManageButton = false }) {
             className={`overflow-hidden rounded-xl shadow-sm transition duration-200 flex flex-col sm:flex-row relative group ${containerClasses}`}
         >
             {/* Left Image Section */}
-            <div className="relative w-full sm:w-2/5 aspect-video sm:aspect-auto sm:h-auto bg-gray-100 min-h-64 max-h-80">
+            <div className="relative w-full sm:w-2/5 aspect-video sm:aspect-auto sm:h-auto bg-gray-100 max-h-80">
                 <img
                     src={data.bannerImageUrl}
                     alt={data.title}
