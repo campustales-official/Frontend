@@ -6,6 +6,7 @@ import {
   confirmVerifyEmailOtp,
 } from "../../api/verifyEmail.api";
 import { useMe } from "../../hooks/useMe";
+import ChangeEmailModal from "../../components/profile/ChangeEmailModal";
 
 export default function VerifyEmailOtpPage() {
   const { data: me } = useMe();
@@ -14,6 +15,7 @@ export default function VerifyEmailOtpPage() {
   const loginImage = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop";
 
   const email = me?.email;
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [countdown, setCountdown] = useState(120);
@@ -79,14 +81,14 @@ export default function VerifyEmailOtpPage() {
     }
   }, [countdown]);
 
-  const hasSentRef = useRef(false);
+  const lastSentEmailRef = useRef(null);
 
   useEffect(() => {
     if (!email) return;
 
-    if (!hasSentRef.current) {
+    if (lastSentEmailRef.current !== email) {
       sendOtpMutation.mutate();
-      hasSentRef.current = true;
+      lastSentEmailRef.current = email;
     }
   }, [email]);
 
@@ -111,6 +113,12 @@ export default function VerifyEmailOtpPage() {
                 We’ve sent a 6-digit verification code to{" "}
                 <span className="font-medium text-gray-700">{email}</span>
               </p>
+              <button
+                onClick={() => setIsEmailModalOpen(true)}
+                className="text-xs text-blue-600 hover:underline font-medium"
+              >
+                Wrong email? Change it
+              </button>
             </div>
 
             {/* OTP Inputs */}
@@ -165,6 +173,13 @@ export default function VerifyEmailOtpPage() {
             </div>
           </div>
         </div>
+
+        {/* Change Email Modal */}
+        <ChangeEmailModal
+          isOpen={isEmailModalOpen}
+          onClose={() => setIsEmailModalOpen(false)}
+          currentEmail={email}
+        />
 
         {/* RIGHT — IMAGE (desktop only) */}
         <div className="hidden lg:flex w-1/2 fixed top-0 right-0 h-full">

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { X, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import { changeEmail } from "../../api/auth.api";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ChangeEmailModal({ isOpen, onClose, currentEmail }) {
+    const queryClient = useQueryClient();
     const [formData, setFormData] = useState({
         newEmail: "",
         currentPassword: ""
@@ -16,6 +17,7 @@ export default function ChangeEmailModal({ isOpen, onClose, currentEmail }) {
         mutationFn: changeEmail,
         onSuccess: (res) => {
             toast.success(res?.data?.message || "Email change request submitted. Please verify your new email.");
+            queryClient.invalidateQueries(["me"]);
             onClose();
             setFormData({ newEmail: "", currentPassword: "" });
         },
@@ -102,10 +104,10 @@ export default function ChangeEmailModal({ isOpen, onClose, currentEmail }) {
                                     value={formData.newEmail}
                                     onChange={(e) => setFormData(prev => ({ ...prev, newEmail: e.target.value }))}
                                     className={`w-full px-4 py-3 pl-11 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 transition-all ${formData.newEmail
-                                            ? isEmailValid && isEmailDifferent
-                                                ? "border-green-500 focus:ring-green-500/20 focus:border-green-500"
-                                                : "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                                            : "border-gray-200 focus:ring-blue-500/20 focus:border-blue-500"
+                                        ? isEmailValid && isEmailDifferent
+                                            ? "border-green-500 focus:ring-green-500/20 focus:border-green-500"
+                                            : "border-red-500 focus:ring-red-500/20 focus:border-red-500"
+                                        : "border-gray-200 focus:ring-blue-500/20 focus:border-blue-500"
                                         }`}
                                     placeholder="Enter new email address"
                                     required
