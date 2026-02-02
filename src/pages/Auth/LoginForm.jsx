@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { GoogleLogin } from "@react-oauth/google";
 import { login, googleLogin } from "../../api/auth.api";
@@ -10,6 +10,7 @@ import { queryClient } from "../../lib/queryClient.js";
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isGooglePending, setIsGooglePending] = useState(false);
+  const navigate = useNavigate();
 
   // Email/Password login mutation
   const { mutate, isPending } = useMutation({
@@ -22,7 +23,13 @@ export default function LoginForm() {
       queryClient.invalidateQueries(["me"]);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Invalid email or password.");
+      const message = error?.response?.data?.message;
+      if (message === "user not found") {
+        toast.error("User not found. Please sign up.");
+        navigate("/signup");
+        return;
+      }
+      toast.error(message || "Invalid email or password.");
     },
   });
 
@@ -39,6 +46,11 @@ export default function LoginForm() {
     },
     onError: (error) => {
       setIsGooglePending(false);
+      if (error?.response?.status === 404) {
+        toast.error("User not found. Please sign up.");
+        navigate("/signup");
+        return;
+      }
       toast.error(error?.response?.data?.message || "Google login failed. Please try again.");
     },
   });

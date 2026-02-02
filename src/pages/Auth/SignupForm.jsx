@@ -15,6 +15,7 @@ export default function SignupForm() {
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordCriteria, setPasswordCriteria] = useState({
     length: false,
     uppercase: false,
@@ -65,6 +66,10 @@ export default function SignupForm() {
 
   const submit = (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
     if (!agreeTerms) {
       toast.error("Please agree to the Terms of Service and Privacy Policy.");
       return;
@@ -190,7 +195,7 @@ export default function SignupForm() {
           <input name="name" required placeholder="John Doe" className={inputClass} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Student Email</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
           <input name="email" type="email" required placeholder="alex@university.edu" className={inputClass} />
         </div>
       </div>
@@ -219,6 +224,25 @@ export default function SignupForm() {
             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         </div>
+        {/* Confirm Password */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
+          <div className="relative">
+            <input
+              name="confirmPassword"
+              type={showPassword ? "text" : "password"}
+              required
+              placeholder="Re-enter your password"
+              className={inputClass + " pr-12"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+          {password && confirmPassword && password !== confirmPassword && (
+            <p className="mt-1 text-xs text-red-500 font-medium">Passwords do not match</p>
+          )}
+        </div>
+
         {/* Password Strength Indicators */}
         <div className="mt-2 space-y-1">
           <p className="text-xs text-gray-500 font-medium mb-1">Password must contain:</p>
@@ -468,10 +492,9 @@ export default function SignupForm() {
         </span>
       </label>
 
-      {/* Submit */}
       <button
         type="submit"
-        disabled={isPending || !agreeTerms || !Object.values(passwordCriteria).every(Boolean)}
+        disabled={isPending || !agreeTerms || !Object.values(passwordCriteria).every(Boolean) || password !== confirmPassword}
         className="w-full bg-blue-600 text-white rounded-lg py-3 text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isPending ? "Creating Account..." : "Create Account"}

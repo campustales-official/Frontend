@@ -85,7 +85,8 @@ function GuardedRoutes() {
 
   // 📧 Logged in but not verified
   if (!me.isEmailVerified) {
-    if (path !== "/verify-email") {
+    const allowedForUnverified = ["/verify-email", "/login", "/signup", "/privacy-policy", "/terms-conditions"];
+    if (!allowedForUnverified.includes(path)) {
       return <Navigate to="/verify-email" replace />;
     }
   }
