@@ -86,6 +86,12 @@ export default function VerifyEmailOtpPage() {
   useEffect(() => {
     if (!email) return;
 
+    // Skip initial send on mount
+    if (lastSentEmailRef.current === null) {
+      lastSentEmailRef.current = email;
+      return;
+    }
+
     if (lastSentEmailRef.current !== email) {
       sendOtpMutation.mutate();
       lastSentEmailRef.current = email;
