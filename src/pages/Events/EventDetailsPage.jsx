@@ -210,7 +210,7 @@ export default function EventDetailsPage() {
                     {/* Right Column: Action Card (Sticky) */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24 space-y-4">
-                            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-8 overflow-hidden relative">
+                            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-8 overflow-hidden relative hidden lg:block">
                                 <h3 className="text-2xl font-black text-gray-900 mb-2">Get Tickets</h3>
                                 <p className="text-gray-500 font-medium mb-8 text-sm">
                                     Secure your spot for this event.
@@ -260,6 +260,26 @@ export default function EventDetailsPage() {
                     </div>
 
                 </div>
+            </div>
+
+            {/* Mobile Registration Footer - Floating at bottom */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 shadow-[0_-10px_20px_rgba(0,0,0,0-0.05)]">
+                <button
+                    onClick={handleRegisterClick}
+                    disabled={isDisabled}
+                    className={`w-full py-4 px-6 rounded-2xl font-black text-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.95] shadow-xl ${isDisabled
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
+                        : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-200/50"
+                        }`}
+                >
+                    <span>{buttonText}</span>
+                    {buttonSubtext && (
+                        <span className="text-xs font-medium opacity-80 bg-black/10 px-2 py-0.5 rounded-full">
+                            {buttonSubtext}
+                        </span>
+                    )}
+                    {!isDisabled && <ArrowRight className="w-5 h-5 ml-auto" />}
+                </button>
             </div>
         </div>
     );
