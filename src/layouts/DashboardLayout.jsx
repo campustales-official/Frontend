@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Sidebar from "../components/layout/Sidebar";
+import InstallPWAPrompt from "../components/layout/InstallPWAPrompt";
 
 export default function DashboardLayout() {
     return (
@@ -17,6 +18,8 @@ export default function DashboardLayout() {
                     </div>
                 </main>
             </div>
+
+            <InstallPWAPrompt />
         </div>
     );
 }
