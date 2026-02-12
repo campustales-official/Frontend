@@ -51,7 +51,7 @@ export default function Navbar() {
         <nav className="h-16 bg-white shadow-sm flex items-center justify-between px-4 fixed top-0 w-full z-50 border-b border-gray-100">
             {/* Left: Logo */}
             <Link to="/" className="flex items-center gap-2">
-                <img src="/logo.png" alt="CampusTales" className="w-9 h-9 object-contain" />
+                <img src="/logo.png" alt="CampusTales" className="w-9 h-9 object-contain rounded-xl" />
                 <span className="font-bold text-xl text-gray-900 block">CampusTales</span>
             </Link>
 

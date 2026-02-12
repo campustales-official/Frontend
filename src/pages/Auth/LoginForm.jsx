@@ -63,8 +63,13 @@ export default function LoginForm() {
   return (
     <form onSubmit={submit} className="space-y-6" autoComplete="off">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
+      <div className="text-center flex flex-col items-center">
+        <img
+          src="/logo.png"
+          alt="CampusTales"
+          className="w-16 h-16 object-contain rounded-2xl mb-4 shadow-sm"
+        />
+        <p className="text-blue-600 font-bold text-xs uppercase tracking-widest mb-1">Welcome to CampusTales</p>
         <p className="mt-2 text-sm text-gray-500">Please enter your details to sign in.</p>
       </div>
 

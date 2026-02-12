@@ -182,8 +182,13 @@ export default function SignupForm() {
 
   return (
     <form onSubmit={submit} className="space-y-5" autoComplete="off">
-      {/* Header */}
-      <div>
+      <div className="flex flex-col items-center text-center">
+        <img
+          src="/logo.png"
+          alt="CampusTales"
+          className="w-16 h-16 object-contain rounded-2xl mb-4 shadow-sm"
+        />
+        <p className="text-blue-600 font-bold text-xs uppercase tracking-widest mb-1">Welcome to CampusTales</p>
         <h1 className="text-3xl font-bold text-gray-900">Create an Account</h1>
         <p className="mt-2 text-sm text-gray-500">Join the community and start connecting with peers.</p>
       </div>

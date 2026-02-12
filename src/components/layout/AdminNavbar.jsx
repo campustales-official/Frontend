@@ -48,7 +48,7 @@ export default function AdminNavbar() {
         <nav className="h-16 bg-white shadow-sm flex items-center justify-between px-6 fixed top-0 w-full z-50 border-b border-gray-100">
             {/* Left: Logo */}
             <Link to="/admin" className="flex items-center gap-2">
-                <img src="/logo.png" alt="CampusTales Admin" className="w-9 h-9 object-contain" />
+                <img src="/logo.png" alt="CampusTales Admin" className="w-9 h-9 object-contain rounded-xl" />
                 <span className="font-bold text-xl text-gray-900">Admin Panel</span>
             </Link>
 

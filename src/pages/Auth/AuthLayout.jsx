@@ -33,12 +33,18 @@ export default function AuthLayout({ isSignup, children }) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               <div className="absolute bottom-10 left-10 right-10 z-10 text-white max-w-md">
                 <div className="flex items-center gap-2 mb-4">
-                  <img src="/logo.png" alt="CampusTales" className="w-10 h-10 object-contain" />
+                  <img src="/logo.png" alt="CampusTales" className="w-10 h-10 object-contain rounded-xl" />
                   <span className="text-xl font-semibold tracking-tight">CampusTales</span>
                 </div>
-                <p className="text-base leading-relaxed text-white/90 border-l-4 border-blue-500 pl-4">
-                  "CampusTales has completely transformed how our student body collaborates on inter-disciplinary projects. It's the digital campus we always needed."
-                </p>
+                <div className="space-y-4 text-white/90 border-l-4 border-blue-500 pl-4">
+                  <p className="text-base font-semibold italic opacity-80">"College life today runs on chaos, CampusTales exists to fix this." ⚙️</p>
+                  <ul className="space-y-2 text-sm opacity-90 list-disc ml-4">
+                    <li>Important updates are buried in WhatsApp groups.</li>
+                    <li>Events are scattered across posters and random links.</li>
+                    <li>Clubs struggle with registrations and data.</li>
+                  </ul>
+                  <p className="text-base font-bold text-blue-400">Building a single platform for how colleges actually work. ✅</p>
+                </div>
               </div>
             </motion.div>
           )}
@@ -64,16 +70,19 @@ export default function AuthLayout({ isSignup, children }) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               <div className="absolute bottom-10 left-10 right-10 z-10 text-white max-w-md">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                  </div>
+                  <img src="/logo.png" alt="CampusTales" className="w-10 h-10 object-contain rounded-xl" />
                   <span className="text-xl font-semibold tracking-tight">CampusTales</span>
                 </div>
-                <p className="text-base leading-relaxed text-white/90 border-l-4 border-blue-500 pl-4">
-                  "Joining CampusTales opened doors to research opportunities I didn't know existed. It's the ultimate network for ambitious students."
-                </p>
+                <div className="space-y-4 text-white/90 border-l-4 border-blue-500 pl-4">
+                  <p className="text-base font-semibold italic opacity-80">Why join the community? 🎓</p>
+                  <ul className="space-y-2 text-sm opacity-90 list-disc ml-4">
+                    <li>College-verified digital platform.</li>
+                    <li>Structured and trusted communication.</li>
+                    <li>Designed for academic environments.</li>
+                    <li>No spam. No confusion. No fragmentation.</li>
+                  </ul>
+                  <p className="text-base font-bold text-blue-400">One platform for your entire campus. ✅</p>
+                </div>
               </div>
             </motion.div>
           ) : (
