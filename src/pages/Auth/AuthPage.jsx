@@ -40,7 +40,7 @@ export default function AuthPage() {
           </p>
 
           {/* Footer Links */}
-          <div className="mt-8 flex flex-col items-center gap-4">
+          <div className="mt-8 flex flex-col items-center justify-center gap-4">
             <p className="text-xs text-gray-500">
               In case of any difficulty, mail us at{" "}
               <a href="mailto:support@campustales.com" className="text-blue-600 hover:underline">
