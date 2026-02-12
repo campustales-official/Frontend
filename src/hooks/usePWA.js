@@ -5,10 +5,14 @@ export const usePWA = () => {
     const [isAppInstalled, setIsAppInstalled] = useState(false);
 
     useEffect(() => {
+        // Check if the event was already captured globally (before React mounted)
+        if (window.__pwaInstallPrompt) {
+            setInstallPrompt(window.__pwaInstallPrompt);
+            window.__pwaInstallPrompt = null;
+        }
+
         const handleBeforeInstallPrompt = (e) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
-            // Stash the event so it can be triggered later.
             setInstallPrompt(e);
         };
 

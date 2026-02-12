@@ -40,14 +40,14 @@ export default function AuthPage() {
           </p>
 
           {/* Footer Links */}
-          <div className="mt-8 flex flex-col items-center justify-center gap-4">
-            <p className="text-xs text-gray-500">
-              In case of any difficulty, mail us at{" "}
+          <div className="mt-8 gap-4">
+            <div className="text-xs text-gray-500 text-center">
+              <p>In case of any difficulty, mail us at</p>
               <a href="mailto:support@campustales.com" className="text-blue-600 hover:underline">
                 support@campustales.com
               </a>
-            </p>
-            <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+            </div>
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-400 mt-5">
               <Link to="/terms-conditions" className="hover:text-gray-600">Terms of Service</Link>
               <Link to="/privacy-policy" className="hover:text-gray-600">Privacy Policy</Link>
             </div>
