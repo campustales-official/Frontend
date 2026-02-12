@@ -8,6 +8,13 @@ import { useMe } from "../../hooks/useMe";
 import { toast } from "react-toastify";
 import { compressImage } from "../../utils/image.utils";
 
+// Converts a UTC date string to a local datetime string for datetime-local inputs
+function toLocalDatetimeString(dateStr) {
+    const d = new Date(dateStr);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 const QUESTION_TYPES = [
     { value: "text", label: "Short Text", icon: Type },
     { value: "textarea", label: "Long Text", icon: AlignLeft },
@@ -83,10 +90,10 @@ export default function EventFormBase({
                 description: initialData.description || "",
                 venue: initialData.venue || "",
                 visibility: initialData.visibility || "college",
-                eventStartAt: initialData.eventStartAt ? new Date(initialData.eventStartAt).toISOString().slice(0, 16) : "",
-                eventEndAt: initialData.eventEndAt ? new Date(initialData.eventEndAt).toISOString().slice(0, 16) : "",
-                registrationStartAt: initialData.registrationStartAt ? new Date(initialData.registrationStartAt).toISOString().slice(0, 16) : "",
-                registrationEndAt: initialData.registrationEndAt ? new Date(initialData.registrationEndAt).toISOString().slice(0, 16) : "",
+                eventStartAt: initialData.eventStartAt ? toLocalDatetimeString(initialData.eventStartAt) : "",
+                eventEndAt: initialData.eventEndAt ? toLocalDatetimeString(initialData.eventEndAt) : "",
+                registrationStartAt: initialData.registrationStartAt ? toLocalDatetimeString(initialData.registrationStartAt) : "",
+                registrationEndAt: initialData.registrationEndAt ? toLocalDatetimeString(initialData.registrationEndAt) : "",
                 capacity: initialData.capacity || "",
                 allowWaitlist: !!initialData.allowWaitlist,
                 requiredUserFields: initialData.requiredUserFields || [],
