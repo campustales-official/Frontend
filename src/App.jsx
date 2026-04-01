@@ -10,6 +10,7 @@ import { useMe } from "./hooks/useMe";
 import AuthPage from "./pages/Auth/AuthPage";
 import VerifyEmailOtpPage from "./pages/Auth/VerifyEmailOtpPage";
 import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
+import LandingPage from "./pages/LandingPage";
 import FeedPage from "./pages/Feed/FeedPage";
 import ScrollToTop from "./components/common/ScrollToTop";
 import AnnouncementsPage from "./pages/Feed/AnnouncementsPage";
@@ -54,17 +55,18 @@ function GuardedRoutes() {
 
   // 🔐 Not logged in
   if (!isLoggedIn) {
-    // Allow access to login/signup/forgot-password only
-    const publicPaths = ["/login", "/signup", "/forgot-password", "/privacy-policy", "/terms-conditions"];
+    // Allow access to root, login/signup/forgot-password only
+    const publicPaths = ["/", "/login", "/signup", "/forgot-password", "/privacy-policy", "/terms-conditions"];
     if (publicPaths.includes(path)) {
       return (
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
-          <Route path="*" element={<Navigate to="/login" state={{ from: location }} replace />} />
+          <Route path="*" element={<Navigate to="/" state={{ from: location }} replace />} />
         </Routes>
       );
     }
